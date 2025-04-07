@@ -4,7 +4,7 @@ import { CalendarDays, XCircle } from "lucide-react";
 const CitaModal = ({ open, setOpen, agendarCita }) => {
   return (
     <Dialog open={open} onClose={() => setOpen(false)} className="relative z-10">
-      <div className="fixed inset-0 bg-gray-400/75 " />
+      <div className="fixed inset-0 bg-gray-400/75" />
       <div className="fixed inset-0 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-xl w-96 text-center relative">
           <button

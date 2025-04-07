@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { CalendarDays } from "lucide-react";
 import MainLayout from "../../layout/MainLayout";
-import Filter from "../../components/citaPsicologo/Filter";
-import AppointmentModal from "../../components/citaPsicologo/CitaModal";
-import AppointmentCard from "../../components/citaPsicologo/CitaCard";
+import Filter from "../../components/citaPaciente/Filter";
+import AppointmentModal from "../../components/citaPaciente/CitaModal";
+import AppointmentCard from "../../components/citaPaciente/CitaCard";
 
 const CitasPaciente = () => {
   const [open, setOpen] = useState(false);
@@ -33,10 +33,10 @@ const CitasPaciente = () => {
 
   return (
     <MainLayout>
-      <div className="p-4">
+      <div className="p-4 mt-8">
         <div className="flex justify-end mb-2">
           <button
-            className="bg-[#5603ad] text-white py-2 px-6 rounded-lg shadow-md hover:bg-[#47038C] transition-all duration-300 flex items-center gap-2"
+            className="bg-[#5603ad] text-white py-2 px-6 rounded-lg  hover:bg-[#47038C] transition-all duration-300 flex items-center gap-2"
             onClick={() => setOpen(true)}
           >
             <CalendarDays className="w-5 h-5" /> Agendar una cita

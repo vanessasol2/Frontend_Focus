@@ -102,14 +102,14 @@ export default function FocusFrameLandingPage() {
                         Servicios
                     </a>
                     <button
-  onClick={() => {
-    console.log("Navegando a /register-psicologo");
-    navigate("/register-psicologo");
-  }}
-  className="rounded-md border border-[#5603AD] py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-[#5603AD] hover:text-white hover:bg-[#5603AD] hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50"
->
-  Registrate
-</button>
+                        onClick={() => {
+                            console.log("Navegando a /register-psicologo");
+                            navigate("/register-psicologo");
+                        }}
+                        className="rounded-md border border-[#5603AD] py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-[#5603AD] hover:text-white hover:bg-[#5603AD] hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50"
+                    >
+                        Registrate
+                    </button>
                     <button
                         onClick={() => navigate("/login")}
                         className="py-2 px-4 text-center text-sm transition-all shadow-sm bg-[#5603ad] text-white rounded-lg hover:bg-[#47038C] transition-all duration-300"

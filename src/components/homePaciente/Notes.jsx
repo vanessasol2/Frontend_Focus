@@ -3,7 +3,7 @@ import React from "react";
 const Notes = () => {
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-gray-700 mb-6">Notas</h1>
+      <h1 className="text-xl font-semibold text-gray-800 mb-6">Notas</h1>
       <div className="p-6 rounded-xl overflow-y-auto max-h-96">
         {Array.from({ length: 5 }, (_, index) => (
           <div

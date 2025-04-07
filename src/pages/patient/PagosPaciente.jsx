@@ -8,7 +8,7 @@ const PagosPaciente = () => {
 
   return (
     <MainLayout>
-      <div className="p-6">
+      <div className="p-6 mt-8">
         {/* Botones de Tabs */}
         <div className="flex gap-4">
           <button

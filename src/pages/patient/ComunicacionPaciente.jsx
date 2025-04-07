@@ -22,7 +22,7 @@ const ComunicacionPaciente = () => {
 
   return (
     <MainLayout>
-      <main className="h-screen md:h-[90vh] grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-gray-50">
+      <main className="h-screen md:h-[90vh] grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-gray-50 mt-8">
         <ContactoList contacts={contacts} selectedContact={selectedContact} setSelectedContact={setSelectedContact} />
         <ChatBox selectedContact={selectedContact} messages={messages} newMessage={newMessage} setNewMessage={setNewMessage} />
       </main>

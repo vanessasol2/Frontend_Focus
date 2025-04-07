@@ -4,7 +4,7 @@ import AppointmentCard from "./AppointmentCard";
 const RecentAppointments = ({ appointments }) => {
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-gray-700 mb-6">
+      <h1 className="text-xl font-semibold text-gray-800 mb-6">
         Citas Recientes
       </h1>
       {appointments.map((appointment, index) => (

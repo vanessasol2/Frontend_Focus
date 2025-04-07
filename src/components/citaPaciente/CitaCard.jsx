@@ -2,7 +2,7 @@ import { CalendarDays, Clock3, CheckCircle, XCircle } from "lucide-react";
 
 const CitaCard = ({ appointment }) => {
   return (
-    <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col space-y-4 hover:shadow-lg transition-all duration-300 border border-gray-200">
+    <div className="bg-white shadow-md rounded-2xl p-6 flex flex-col space-y-4 hover:shadow-lg transition-all duration-300 border border-gray-200 ">
       <h3 className="text-gray-800 text-lg font-semibold">Psicólogo:</h3>
       <h2 className="text-gray-600 text-lg">{appointment.name}</h2>
       <div className="flex justify-between items-center text-gray-600">

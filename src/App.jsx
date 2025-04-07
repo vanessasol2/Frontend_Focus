@@ -9,6 +9,9 @@ import HistorialPaciente from "./pages/patient/HistorialPaciente";
 import ComunicacionPaciente from "./pages/patient/ComunicacionPaciente";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import FocusFrameLandingPage from "./pages/focusFrameLandingPage/FocusFrameLandingPage"
+import HomePsicologo from "./pages/psicologo/HomePsicologo"
+import Pacientes from "./pages/psicologo/Pacientes"
+import CitasPsicologo from "./pages/psicologo/CitasPsicologo";
 
 function App() {
   return (
@@ -71,7 +74,25 @@ function App() {
         path="/home-psicologo" 
         element={
           <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
-            <HomePaciente />
+            <HomePsicologo />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/pacientes" 
+        element={
+          <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
+            <Pacientes />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/citas-psicologo" 
+        element={
+          <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
+            <CitasPsicologo />
           </ProtectedRoute>
         } 
       />

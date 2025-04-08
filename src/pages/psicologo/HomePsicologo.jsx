@@ -1,15 +1,11 @@
 import React, { useState } from "react";
-import {
-  CalendarCheck2,
-  SquareCheckBig,
-  ClockAlert,
-  BanIcon,
-} from "lucide-react";
+import {CalendarCheck2,SquareCheckBig, ClockAlert,BanIcon,} from "lucide-react";
 import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
 import ResumenCard from "../../components/homePsicologo/ResumenCard";
 import CalendarioSection from "../../components/homePsicologo/CalendarioCita";
 import ListaPacientes from "../../components/homePsicologo/ListaPacientes";
 import ReunionesContenedor from "../../components/homePsicologo/ReunionesContenedor";
+
 
 const HomePsicologo = () => {
   const [date, setDate] = useState(new Date());
@@ -60,25 +56,10 @@ const HomePsicologo = () => {
     "Vanessa Sol",
   ];
 
-  const reuniones = [
-    {
-      paciente: "Tatiana Pulido",
-      fecha: "08/04/2025",
-      hora: "10:00 AM",
-      estado: "Confirmada",
-    },
-    {
-      paciente: "Mateo Jaz",
-      fecha: "08/04/2025",
-      hora: "11:30 AM",
-      estado: "Pendiente",
-    },
-    {
-      paciente: "Sofía Yazon",
-      fecha: "08/04/2025",
-      hora: "1:00 PM",
-      estado: "Confirmada",
-    },
+  const appointments = [
+    { client: "Sara Mateus", status: "Completada", time: "1:00pm - 2:30pm", date: "23 Nov 2024" },
+    { client: "Sara Mateus", status: "Pendiente", time: "3:00pm - 4:00pm", date: "24 Nov 2024" },
+    { client: "Sara Mateus", status: "Cancelada", time: "10:00am - 11:30am", date: "25 Nov 2024" },
   ];
 
   return (
@@ -93,7 +74,7 @@ const HomePsicologo = () => {
       </div>
 
       {/*  ReunionesContenedor */}
-      <ReunionesContenedor reuniones={reuniones} />
+      <ReunionesContenedor appointments={appointments} />
     </div>
 
     {/* Calendario + Pacientes */}

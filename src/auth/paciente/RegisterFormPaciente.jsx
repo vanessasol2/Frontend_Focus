@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { User, Lock, Eye, EyeOff } from "lucide-react"; 
+import { User, Lock, Eye, EyeOff } from "lucide-react";
 import agendar from "../../img/agendar.webp";
 
 export function RegisterFormPaciente() {
@@ -11,10 +11,10 @@ export function RegisterFormPaciente() {
 
   const [mensajeError, setMensajeError] = useState("");
   const [register, setRegister] = useState({
-    username: "",  
+    username: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
 
   const handleChange = (e) => {
@@ -45,14 +45,14 @@ export function RegisterFormPaciente() {
     }
 
     setMensajeError("");
-  
+
     try {
       const response = await axios.post(
         `${API_URL}/paciente/completar-perfil/${pacienteId}`,
         register,
         { headers: { "Content-Type": "application/json" } }
       );
-  
+
       alert("Perfil completado con éxito Paciente!");
       setRegister({ username: "", password: "" });
       navigate("/login");
@@ -70,7 +70,12 @@ export function RegisterFormPaciente() {
           <p className="text-gray-500 mb-6">Registra tu cuenta para acceder</p>
 
           <form onSubmit={handleRegister} className="space-y-4">
+
+            {/* Input Usuario */}
             <div className="relative">
+              <label htmlFor="username" className="sr-only">
+                Nombre de Usuario
+              </label>
               <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
@@ -83,7 +88,11 @@ export function RegisterFormPaciente() {
               />
             </div>
 
+            {/* Input Contraseña */}
             <div className="relative">
+              <label htmlFor="password" className="sr-only">
+                Contraseña
+              </label>
               <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type={showPassword ? "text" : "password"}
@@ -94,7 +103,7 @@ export function RegisterFormPaciente() {
                 required
                 className="w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#5603AD] focus:outline-none transition-all"
               />
-    
+
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
@@ -126,14 +135,13 @@ export function RegisterFormPaciente() {
 
             <button
               type="submit"
-              className={`w-full button-primary text-white py-3 rounded-lg transition-all ${
-                !aceptaTerminos ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`w-full button-primary text-white py-3 rounded-lg transition-all ${!aceptaTerminos ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               disabled={!aceptaTerminos}
             >
               Guardar
             </button>
-            
+
             {mensajeError && <p className="text-red-500 text-sm text-center mt-2">{mensajeError}</p>}
           </form>
         </div>

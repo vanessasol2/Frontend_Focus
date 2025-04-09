@@ -13,6 +13,7 @@ export function LoginFormPaciente() {
   const [email, setEmailValue] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,59 +25,71 @@ export function LoginFormPaciente() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Datos enviados: ", email, password);
+
+    // Validación personalizada antes de enviar
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMensajeError("El formato del correo no es válido.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setMensajeError("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+
+    setMensajeError("");
+    setLoading(true);
 
     const data = { email, password };
 
     try {
-      const response = await axios.post("http://localhost:8081/auth/login", data);
+      const response = await axios.post(
+        "http://localhost:8081/auth/login",
+        data
+      );
 
       if (response.data && response.data.token) {
         const token = response.data.token;
 
-        
         if (rememberMe) {
           localStorage.setItem("token", token);
         } else {
           sessionStorage.setItem("token", token);
         }
 
-        
         const decoded = jwtDecode(token);
-        console.log("Token decodificado:", decoded);
-
-        
-        const roles = Array.isArray(decoded.roles) ? decoded.roles : [decoded.roles];
-        console.log("Roles extraídos:", roles);
-
+        const roles = Array.isArray(decoded.roles)
+          ? decoded.roles
+          : [decoded.roles];
         const user = { email };
 
         dispatch(login({ user, role: roles, token }));
 
         alert("Login exitoso");
 
-       
         if (roles.includes("PACIENTE")) {
-          console.log("Redirigiendo a home-paciente");
           navigate("/home-paciente");
         } else if (roles.includes("PSICOLOGO")) {
-          console.log("Redirigiendo a home-psicologo");
           navigate("/home-psicologo");
         } else {
-          console.error("Rol desconocido:", roles);
           setMensajeError("Acceso denegado. Rol no reconocido.");
         }
       } else {
-        alert("Usuario o contraseña incorrectos");
+        setMensajeError("Usuario o contraseña incorrectos.");
       }
     } catch (error) {
       if (error.response) {
         if (error.response.status === 401) {
           setMensajeError("Usuario o contraseña incorrectos");
         } else if (error.response.status === 500) {
-          setMensajeError("Error");
+          setMensajeError("Error interno del servidor");
         }
+      } else {
+        setMensajeError("No se pudo conectar con el servidor");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,32 +99,56 @@ export function LoginFormPaciente() {
         {/* FORMULARIO */}
         <div className="w-1/2 p-10 flex flex-col justify-center h-full">
           <h4 className="text-xl font-semibold text-[#5603AD]">Focus Frame</h4>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">¡Bienvenidos!</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            ¡Bienvenidos!
+          </h2>
 
           <form className="space-y-4" onSubmit={handleLogin}>
             {/* Input Email */}
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <label htmlFor="email" className="sr-only">
+                Correo electrónico
+              </label>
+              <Mail
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
               <input
+                id="email"
                 type="email"
                 placeholder="Correo electrónico"
                 value={email}
                 onChange={handleEmailChange}
                 required
-                className="w-full p-3 pl-12 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#5603AD] focus:outline-none transition-all"
+                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none transition-all
+                   ${mensajeError && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+                    ? "border-red-500 focus:ring-red-500"
+                    : "focus:ring-2 focus:ring-[#5603AD]"
+                  }`}
               />
             </div>
 
             {/* Input Contraseña */}
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <label htmlFor="password" className="sr-only">
+                Contraseña
+              </label>
+              <Lock
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                size={20}
+              />
               <input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Contraseña"
                 value={password}
                 onChange={handlePasswordChange}
                 required
-                className="w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#5603AD] focus:outline-none transition-all"
+                className={`w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:outline-none transition-all 
+                  ${mensajeError && password.length < 6
+                    ? "border-red-500 focus:ring-red-500"
+                    : "focus:ring-2 focus:ring-[#5603AD]"
+                  }`}
               />
               <button
                 type="button"
@@ -133,7 +170,10 @@ export function LoginFormPaciente() {
                 />
                 Remember me
               </label>
-              <a href="/forgot-password" className="text-sm text-[#5603AD] font-semibold hover:underline">
+              <a
+                href="/forgot-password"
+                className="text-sm text-[#5603AD] font-semibold hover:underline"
+              >
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
@@ -142,16 +182,22 @@ export function LoginFormPaciente() {
             <button
               type="submit"
               className="w-full text-white py-3 rounded-lg transition-all button-primary"
+              disabled={loading}
             >
-              Iniciar Sesión
+              {loading ? "Ingresando..." : "Iniciar Sesión"}
             </button>
 
             {/* Mensaje de error */}
-            {mensajeError && <p className="text-red-500 text-sm text-center mt-2">{mensajeError}</p>}
+            {mensajeError && (
+              <p className="text-red-500 text-sm text-center mt-2">
+                {mensajeError}
+              </p>
+            )}
           </form>
 
           <p className="text-sm text-gray-600 mt-4 text-center">
-            © {new Date().getFullYear()} FocusFrame. Todos los derechos reservados.
+            © {new Date().getFullYear()} FocusFrame. Todos los derechos
+            reservados.
           </p>
         </div>
 
@@ -163,7 +209,9 @@ export function LoginFormPaciente() {
             alt="Focus Frame"
           />
           <p className="text-center text-white mt-4 text-lg">
-            Con <span className="font-bold text-[#f0e1ff]">FocusFrame</span>, administra tu calendario, citas y archivos de cliente desde una interfaz unificada.
+            Con <span className="font-bold text-[#f0e1ff]">FocusFrame</span>,
+            administra tu calendario, citas y archivos de cliente desde una
+            interfaz unificada.
           </p>
         </div>
       </div>

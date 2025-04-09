@@ -46,16 +46,12 @@ export function RegisterFormPsicologo() {
             if (step === 1) {
                 const response = await axios.post(`${API_URL}/funcionario/paso1`, personal);
                 console.log("Respuesta completa del backend:", response);
-
                 console.log("Paso 1 Response:", response.data);
                 setPsicologoId(response.data);
-
-
                 setStep(2)
             }
 
             else if (step === 2) {
-
                 const response = await axios.post(`${API_URL}/funcionario/paso2/${psicologoId}`, {
                     psicologoId,
                     ...register,

@@ -1,6 +1,15 @@
+import React from "react";
+import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo"; 
+import MisPacientes from "../../components/paciente/MisPacientes"; 
+
 const Pacientes = () => {
-    // ... tu componente
-  };
-  
-  export default Pacientes;
-  
+  return (
+    <MainLayoutPsicologo>
+      <div className="p-4">
+        <MisPacientes />
+      </div>
+    </MainLayoutPsicologo>
+  );
+};
+
+export default Pacientes;

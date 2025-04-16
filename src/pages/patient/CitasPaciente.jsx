@@ -5,6 +5,7 @@ import Filter from "../../components/citaPaciente/Filter";
 import AppointmentModal from "../../components/citaPaciente/CitaModal";
 import AppointmentCard from "../../components/citaPaciente/CitaCard";
 
+
 const CitasPaciente = () => {
   const [open, setOpen] = useState(false);
   const [appointments, setAppointments] = useState([

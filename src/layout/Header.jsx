@@ -1,67 +1,72 @@
 import { useLocation, Link } from "react-router-dom";
 import Notificaciones from "../components/header/Notifications";
-import "../layout/style/Header.css"; 
+import "../layout/style/Header.css";
 
 const Header = () => {
   const location = useLocation();
 
-  // Mapeo 
+  
   const routeNames = {
-    "/home-paciente": "Home",
-    "/citas": "Citas",
-    "/pagos": "Pagos",
+    "/home-paciente": "Inicio",
+    "/citas": "Mis Citas",
+    "/pagos": "Pagos ",
     "/historial": "Historial Clínico",
-    "/comunicacion": "Comunicación",
+    "/comunicacion": "Comunicación ",
   };
 
+  
+  const getPageTitle = () => {
+    return routeNames[location.pathname] || "Inicio";
+  };
+
+ 
   const generateBreadcrumb = () => {
-    const paths = location.pathname.split("/").filter(Boolean); // Divide la ruta y elimina elementos vacíos
-    const breadcrumbItems = [];
+    const paths = location.pathname.split("/").filter(Boolean);
+    if (paths.length === 0) return null;
 
-    breadcrumbItems.push(
-      <li key="home">
-        <Link to="/home-paciente" className="breadcrumb-link">
-          Home
-        </Link>
-      </li>
-    );
-
-    // Genera los enlaces para cada segmento de la ruta
     let currentPath = "";
-    paths.forEach((path, index) => {
+    return paths.map((path, index) => {
       currentPath += `/${path}`;
       const isLast = index === paths.length - 1;
+      const routeName = routeNames[currentPath] || path;
 
-      breadcrumbItems.push(
-        <li key={currentPath}>
+      return (
+        <li key={currentPath} className="breadcrumb-item">
           {!isLast ? (
             <>
               <span className="breadcrumb-separator">/</span>
-              <Link to={currentPath} className="breadcrumb-link">
-                {routeNames[currentPath] || path}
+              <Link to={currentPath} className="breadcrumb-link" aria-current={isLast ? "page" : undefined}>
+                {routeName}
               </Link>
             </>
           ) : (
             <>
               <span className="breadcrumb-separator">/</span>
-              <span className="breadcrumb-active">
-                {routeNames[currentPath] || path}
+              <span className="breadcrumb-active" aria-current="page">
+                {routeName}
               </span>
             </>
           )}
         </li>
       );
     });
-
-    return breadcrumbItems;
   };
 
   return (
-    <header className="header">
+    <header className="header" role="banner">
       <div className="breadcrumb-download">
         <div>
-          <h1 className="breadcrumb-title">{routeNames[location.pathname] || "Home"}</h1>
-          <ul className="breadcrumb-list">{generateBreadcrumb()}</ul>
+          <h1 className="breadcrumb-title">{getPageTitle()}</h1>
+          <nav aria-label="Ruta de navegación">
+            <ul className="breadcrumb-list">
+              <li key="home">
+                <Link to="/home-paciente" className="breadcrumb-link">
+                  Inicio
+                </Link>
+              </li>
+              {generateBreadcrumb()}
+            </ul>
+          </nav>
         </div>
         <Notificaciones />
       </div>

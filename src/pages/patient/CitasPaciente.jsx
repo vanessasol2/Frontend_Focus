@@ -37,7 +37,7 @@ const CitasPaciente = () => {
       <div className="p-4 mt-8">
         <div className="flex justify-end mb-2">
           <button
-            className="bg-[#5603ad] text-white py-2 px-6 rounded-lg  hover:bg-[#47038C] transition-all duration-300 flex items-center gap-2"
+            className="bg-primary-color text-white py-2 px-6 rounded-lg  hover:bg-secundary-color transition-all duration-300 flex items-center gap-2"
             onClick={() => setOpen(true)}
           >
             <CalendarDays className="w-5 h-5" /> Agendar una cita

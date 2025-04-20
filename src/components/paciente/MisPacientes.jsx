@@ -3,7 +3,7 @@ import { Plus, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import FiltrosPacientes from "../../components/paciente/FiltrosPacientes";
 import TarjetaPaciente from "../../components/paciente/TarjetaPaciente";
-import { generarPacientesEjemplo } from "../../components/paciente/generarPacientes";
+import { generarPacientesEjemplo } from "../../components/paciente/generarPacientes.js";
 
 const MisPacientes = () => {
   const [busqueda, setBusqueda] = useState("");
@@ -24,12 +24,13 @@ const MisPacientes = () => {
   );
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className=" mt-7">
+      
       <FiltrosPacientes 
         valorBusqueda={busqueda} 
         onChangeBusqueda={(e) => setBusqueda(e.target.value)} 
       />
-
+      
       {cargando ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, index) => (
@@ -64,7 +65,7 @@ const MisPacientes = () => {
           </p>
           <Link 
             to="/crear-paciente" 
-            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-primary-color hover:bg-secundary-color focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
           >
             <Plus size={16} className="mr-1" />
             Agregar nuevo paciente

@@ -1,12 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { UserPlus, ArrowLeft } from "lucide-react";
 import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
+import FiltroCrear from "./FiltroCrear";
+import { Toaster,toast } from "sonner";
+
+
+const EXPRESION_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EXPRESION_TELEFONO = /^[0-9]{10,15}$/;
+
+
+const CAMPOS_FORMULARIO = [
+  { nombre: "nombre", etiqueta: "Nombre(s)", tipo: "text", ejemplo: "Ingresa el nombre del paciente ", requerido: true,title: "Ingresa el nombre del paciente" },
+  { nombre: "apellido", etiqueta: "Apellido(s)", tipo: "text", ejemplo: "Ingresa el apellido del paciente", requerido: true, title: "Ingresa el apellido del paciente"},
+  { nombre: "documento", etiqueta: "Documento de Identidad", tipo: "text", ejemplo: "Ingresa el documento del paciente", requerido: true,title: "Ingresa el documento del paciente" },
+  { nombre: "fechaNacimiento", etiqueta: "Fecha de Nacimiento", tipo: "date", requerido: true,title: "Ingresa fecha de nacimiento del paciente" },
+  { nombre: "telefono", etiqueta: "Teléfono", tipo: "tel", ejemplo: "Ingresa el telefono del paciente", requerido: true,title: "Ingresa el telefono del paciente" },
+  { nombre: "email", etiqueta: "Correo Electrónico", tipo: "email", ejemplo: "Ingresa el correo del paciente", requerido: true,title: "Ingresa el correo del paciente" }
+];
 
 const CrearPaciente = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const navegar = useNavigate();
+  const [datosFormulario, setDatosFormulario] = useState({
     nombre: "",
     apellido: "",
     telefono: "",
@@ -15,220 +30,164 @@ const CrearPaciente = () => {
     fechaNacimiento: "",
   });
 
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errores, setErrores] = useState({});
+  const [estaEnviando, setEstaEnviando] = useState(false);
 
-  const handleChange = (e) => {
+  
+  const manejarCambio = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: "" });
-    }
-  };
+    setDatosFormulario(prev => ({ ...prev, [name]: value }));
+    if (errores[name]) setErrores(prev => ({ ...prev, [name]: "" }));
+  }, [errores]);
 
-  const validateForm = () => {
-    let tempErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^[0-9]{10,15}$/;
+ 
+  const validarFormulario = useCallback(() => {
+    const erroresTemporales = {};
 
-    if (!formData.nombre.trim()) tempErrors.nombre = "El nombre es requerido";
-    if (!formData.apellido.trim()) tempErrors.apellido = "El apellido es requerido";
-    if (!formData.telefono.trim()) {
-      tempErrors.telefono = "El teléfono es requerido";
-    } else if (!phoneRegex.test(formData.telefono)) {
-      tempErrors.telefono = "Teléfono no válido";
-    }
-    if (!formData.email.trim()) {
-      tempErrors.email = "El correo electrónico es requerido";
-    } else if (!emailRegex.test(formData.email)) {
-      tempErrors.email = "Correo electrónico no válido";
-    }
-    if (!formData.documento.trim()) tempErrors.documento = "El documento es requerido";
-    if (!formData.fechaNacimiento) tempErrors.fechaNacimiento = "La fecha de nacimiento es requerida";
+    if (!datosFormulario.nombre.trim()) erroresTemporales.nombre = "Este campo es obligatorio.";
+    if (!datosFormulario.apellido.trim()) erroresTemporales.apellido = "Este campo es obligatorio.";
+    if (!datosFormulario.documento.trim()) erroresTemporales.documento = "Este campo es obligatorio.";
+    if (!datosFormulario.fechaNacimiento) erroresTemporales.fechaNacimiento = "Seleccione una fecha válida.";
     
-    return tempErrors;
-  };
+    if (!datosFormulario.telefono.trim()) {
+      erroresTemporales.telefono = "Este campo es obligatorio.";
+    } else if (!EXPRESION_TELEFONO.test(datosFormulario.telefono)) {
+      erroresTemporales.telefono = "Número no válido. Use solo dígitos (10-15).";
+    }
+    
+    if (!datosFormulario.email.trim()) {
+      erroresTemporales.email = "Este campo es obligatorio.";
+    } else if (!EXPRESION_EMAIL.test(datosFormulario.email)) {
+      erroresTemporales.email = "Correo electrónico no válido.";
+    }
 
-  const handleSubmit = async (e) => {
+    return erroresTemporales;
+  }, [datosFormulario]);
+
+  
+  const manejarEnvio = async (e) => {
     e.preventDefault();
-    const formErrors = validateForm();
-    
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
+    const erroresFormulario = validarFormulario();
+  
+    if (Object.keys(erroresFormulario).length > 0) {
+      setErrores(erroresFormulario);
+      toast.error("Por favor completa los campos antes de continuar.");
       return;
     }
-
-    setIsSubmitting(true);
-    
+  
+    setEstaEnviando(true);
     try {
-      const response = await axios.post("http://localhost:8081/paciente/registrar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const token = localStorage.getItem("token");
+      await axios.post(
+        "http://localhost:8081/paciente/registrar",
+        datosFormulario,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success("Paciente creado con éxito");
+      navegar("/pacientes");
+    } catch (error) {
+      let mensajeError = "Error al crear el paciente";
+      let descripcionError = "Ocurrió un error inesperado";
+      
+      if (error.response) {
+        
+        if (error.response.status === 409 && error.response.data.message?.toLowerCase().includes("correo")) {
+          mensajeError = "Correo electrónico ya registrado";
+          descripcionError = "El correo proporcionado ya está en uso por otro paciente";
+          
+          
+          setErrores(prev => ({ ...prev, email: "Este correo ya está registrado" }));
+        } 
+        
+        else if (error.response.data.message) {
+          descripcionError = error.response.data.message;
+        }
+      } else if (error.message) {
+        descripcionError = error.message;
+      }
+      
+      toast.error(mensajeError, {
+        description: descripcionError,
+        action: {
+          label: "Reintentar",
+          onClick: () => manejarEnvio(e),
         },
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al crear paciente");
-      }
-
-      const data = await response.json();
-      console.log("Paciente creado:", data);
-      alert("Paciente creado con éxito");
-      navigate("/pacientes");
-    } catch (error) {
-      console.error("Error:", error);
-      alert(error.message || "Ocurrió un error al crear el paciente");
     } finally {
-      setIsSubmitting(false);
+      setEstaEnviando(false);
     }
   };
+
+  
+  const renderizarCampo = ({ nombre, etiqueta, tipo, ejemplo }) => (
+    <div key={nombre} className="mb-4">
+      <label htmlFor={nombre} className="block text-sm font-medium text-gray-700 mb-1">
+        {etiqueta} {<span className="text-red-500">*</span>}
+      </label>
+      <input
+        id={nombre}
+        name={nombre}
+        type={tipo}
+        value={datosFormulario[nombre]}
+        onChange={manejarCambio}
+        placeholder={ejemplo}
+        title={ejemplo}
+        className={`w-full px-3 py-2 border rounded-md ${
+          errores[nombre] ? "border-red-500" : "border-gray-300 focus:ring-[#5603AD]"
+        } focus:outline-none focus:ring-2`}
+        max={nombre === "fechaNacimiento" ? new Date().toISOString().split("T")[0] : undefined}
+      />
+      {errores[nombre] && <p className="mt-1 text-sm text-red-500">{errores[nombre]}</p>}
+    </div>
+  );
 
   return (
     <MainLayoutPsicologo>
-      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-sm">
-        <div className="flex items-center mb-6">
-          <button 
-            onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 hover:text-[#5603ad] mr-4"
-          >
-            <ArrowLeft size={20} className="mr-1" />
-          </button>
-          <h1 className="text-2xl font-semibold text-[#5603ad] flex items-center">
-            <UserPlus size={24} className="mr-2 text-[#5603ad]" />
-            Crear Nuevo Paciente
-          </h1>
+      <Toaster richColors position="top-right" />
+      <div className="p-4 mt-7">
+        <FiltroCrear />
+
+        <div className="max-w-6xl mx-auto p-6 rounded-lg ">
+          <h1 className="text-xl font-semibold mb-6 text-gray-800">Datos Personales</h1>
+
+          <form onSubmit={manejarEnvio} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {CAMPOS_FORMULARIO.map(renderizarCampo)}
+            </div>
+
+            <div className="flex justify-end pt-4 space-x-3">
+              <button
+                type="button"
+                onClick={() => navegar(-1)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={estaEnviando}
+                className="px-4 py-2 bg-[#5603ad] text-white rounded-md hover:bg-[#47038C] disabled:bg-violet-400 flex items-center transition-colors"
+              >
+                {estaEnviando ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Procesando...
+                  </>
+                ) : (
+                  "Crear Paciente"
+                )}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Nombre */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre(s) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${errors.nombre ? "border-red-500" : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5603AD] "}`}
-                placeholder="Ingrese el nombre"
-              />
-              {errors.nombre && <p className="mt-1 text-sm text-red-500">{errors.nombre}</p>}
-            </div>
-
-            {/* Apellido */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Apellido(s) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="apellido"
-                value={formData.apellido}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${errors.apellido ? "border-red-500" : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5603AD]"}`}
-                placeholder="Ingrese el apellido"
-              />
-              {errors.apellido && <p className="mt-1 text-sm text-red-500">{errors.apellido}</p>}
-            </div>
-
-            {/* Documento */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Documento de Identidad <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="documento"
-                value={formData.documento}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${errors.documento ? "border-red-500" : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5603AD]"}`}
-                placeholder="Número de documento"
-              />
-              {errors.documento && <p className="mt-1 text-sm text-red-500">{errors.documento}</p>}
-            </div>
-
-            {/* Fecha de Nacimiento */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fecha de Nacimiento <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="fechaNacimiento"
-                value={formData.fechaNacimiento}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${errors.fechaNacimiento ? "border-red-500" : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5603AD]"}`}
-                max={new Date().toISOString().split('T')[0]}
-              />
-              {errors.fechaNacimiento && <p className="mt-1 text-sm text-red-500">{errors.fechaNacimiento}</p>}
-            </div>
-
-          
-            {/* Teléfono */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Teléfono <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${errors.telefono ? "border-red-500" : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5603AD]"}`}
-                placeholder="Ej: 3101234567"
-              />
-              {errors.telefono && <p className="mt-1 text-sm text-red-500">{errors.telefono}</p>}
-            </div>
-
-            {/* Email */}
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Correo Electrónico <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-md ${errors.email ? "border-red-500" : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#5603AD]"}`}
-                placeholder="ejemplo@correo.com"
-              />
-              {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
-            </div>
-
-          </div>
-
-          <div className="flex justify-end pt-4">
-            <button
-              type="button"
-              onClick={() => navigate(-1)}
-              className="mr-3 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 bg-[#5603ad] text-white rounded-md hover:bg-[#47038C] disabled:bg-violet-400 flex items-center"
-            >
-              {isSubmitting ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Procesando...
-                </>
-              ) : (
-                "Crear Paciente"
-              )}
-            </button>
-          </div>
-        </form>
       </div>
     </MainLayoutPsicologo>
   );

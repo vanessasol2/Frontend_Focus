@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import { LoginFormPaciente } from "./auth/paciente/LoginFormPaciente";
 import { RegisterFormPaciente } from "./auth/paciente/RegisterFormPaciente";
 import { RegisterFormPsicologo } from "./auth/psicologo/RegisterFormPsicologo";
+import {OlvideContrasena}  from "./auth/paciente/OlvideContrasena";
+import RestablecerContrasena from "./auth/paciente/RestablecerContrasena";
 //Paciente
 import HomePaciente from "./pages/patient/HomePaciente";
 import CitasPaciente from "./pages/patient/CitasPaciente";
@@ -10,6 +12,8 @@ import HistorialPaciente from "./pages/patient/HistorialPaciente";
 import ComunicacionPaciente from "./pages/patient/ComunicacionPaciente";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import FocusFrameLandingPage from "./pages/focusFrameLandingPage/FocusFrameLandingPage";
+import PoliticaPrivacidad from "./auth/psicologo/PoliticaPrivacidad";
+
 //Psicologo
 import HomePsicologo from "./pages/psicologo/HomePsicologo";
 import Pacientes from "./pages/psicologo/Pacientes";
@@ -25,8 +29,11 @@ function App() {
 
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginFormPaciente />} />
+      <Route path="/olvide-contrasena" element={<OlvideContrasena />} />
+      <Route path="/restablecer-contrasena" element={<RestablecerContrasena />} />
       <Route path="/register/:pacienteId" element={<RegisterFormPaciente />} />
       <Route path="/register-psicologo" element={<RegisterFormPsicologo />} />
+      <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />
 
       {/* Rutas protegidas */}
       <Route

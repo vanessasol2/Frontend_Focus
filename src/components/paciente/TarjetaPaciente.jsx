@@ -16,7 +16,7 @@ const TarjetaPaciente = ({ paciente }) => (
   <div className="bg-white p-4 rounded-xl border border-gray-100 hover:shadow-md transition-shadow flex flex-col justify-between">
     <div className="flex items-center gap-3 mb-3">
       <div className="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
-        <User className="text-violet-600" size={18} />
+        <User className="text-primary-color" size={18} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm truncate" title={paciente.nombre}>{paciente.nombre}</p>
@@ -33,7 +33,7 @@ const TarjetaPaciente = ({ paciente }) => (
         <Calendar size={14} />
         {paciente.ultimaVisita}
       </span>
-      <span className={`text-xs px-3 py-1 rounded-full ${
+      <span className={`text-xs px-4 py-1 rounded-full ml-2 ${
         paciente.tieneCitasPendientes 
           ? 'bg-amber-100 text-amber-800' 
           : 'bg-gray-100 text-gray-800'
@@ -45,7 +45,7 @@ const TarjetaPaciente = ({ paciente }) => (
     <div className="flex justify-between border-t pt-3">
       <Link 
         to={`/historial-clinico/${paciente.id}`}
-        className="text-xs text-[#5603ad] font-medium hover:underline"
+        className="text-xs text-primary-color font-medium hover:underline"
       >
         Ver historia clínica
       </Link>

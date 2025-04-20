@@ -1,19 +1,45 @@
 import { User, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const ListaPacientes = ({ pacientes }) => {
+const ListaPacientes = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredPacientes = pacientes.filter((paciente) =>
-    paciente.toLowerCase().includes(searchTerm.toLowerCase())
+  const [pacientes, setPacientes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+
+  
+  useEffect(() => {
+    const fetchPacientes = async () => {
+      try {
+        const response = await fetch("http://localhost:8081/pacientes"); 
+        if (!response.ok) throw new Error("Error al cargar pacientes");
+        const data = await response.json();
+        setPacientes(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    fetchPacientes();
+  }, []);
+
+  // Filtrar pacientes 
+  const pacientesFiltrados = pacientes.filter((paciente) =>
+    paciente.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (cargando) return <p className="text-center text-primary-color">Cargando pacientes...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="p-4 w-full">
       <h2 className="text-xl font-semibold text-gray-800 mb-6">Pacientes</h2>
 
-      {/* Barra de búsqueda */}
+      {/* Barra de búsqueda (igual que antes) */}
       <div className="flex items-center bg-white rounded-xl px-4 py-2 shadow-md mb-6">
-        <Search className="w-5 h-5 text-[#5603ad] mr-2" />
+        <Search className="w-5 h-5 text-primary-color mr-2" />
         <input
           type="text"
           placeholder="Buscar Paciente"
@@ -22,21 +48,21 @@ const ListaPacientes = ({ pacientes }) => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button
-          className="bg-[#5603ad] text-white text-sm px-2 py-2 rounded-lg hover:bg-[#47038C] transition"
-          onClick={() => setSearchTerm("")} 
+          className="bg-primary-color text-white text-sm px-2 py-2 rounded-lg hover:bg-secundary-color transition"
+          onClick={() => setSearchTerm("")}
         >
           Limpiar
         </button>
       </div>
 
-      {/* Lista de pacientes con scroll */}
-      {filteredPacientes.length === 0 ? (
+      {/* Lista de pacientes */}
+      {pacientesFiltrados.length === 0 ? (
         <p className="text-center text-gray-500">No se encontraron pacientes</p>
       ) : (
         <ul className="space-y-4 max-h-96 overflow-y-auto">
-          {filteredPacientes.map((paciente, idx) => (
+          {pacientesFiltrados.map((paciente) => (
             <li
-              key={idx}
+              key={paciente.id} 
               className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
             >
               <div className="flex items-center gap-4">
@@ -44,11 +70,13 @@ const ListaPacientes = ({ pacientes }) => {
                   <User className="w-6 h-6 text-gray-500" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-800">{paciente}</p>
-                  <p className="text-sm text-gray-500">Historia Clínica</p>
+                  <p className="font-medium text-gray-800">{paciente.nombre}</p>
+                  <p className="text-sm text-gray-500">
+                    {paciente.historiaClinica || "Sin historia clínica"}
+                  </p>
                 </div>
               </div>
-              <button className="text-[#5603ad] text-sm hover:underline">
+              <button className="text-primary-color text-sm hover:underline">
                 Ver detalles
               </button>
             </li>

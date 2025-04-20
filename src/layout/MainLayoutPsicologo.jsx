@@ -1,9 +1,9 @@
 import Sidebar from "../layout/SidebarPsicologo";
-import Header from "../layout/Header";
+import HeaderMedico from "../layout/HeaderMedico";
 
 const MainLayoutPsicologo = ({ children }) => {
   return (
-    <div className="h-screen flex bg-layout-bg">
+    <div className="h-screen flex bg-content-bg">
       {/* LEFT Sidebar */}
       <div className="flex h-screen overflow-hidden">
         <Sidebar className="h-full" /> 
@@ -11,7 +11,7 @@ const MainLayoutPsicologo = ({ children }) => {
 
       {/* RIGHT Content */}
       <div className="flex-1 bg-content-bg overflow-auto flex flex-col">
-        <Header /> 
+        <HeaderMedico /> 
         <main className="flex-1 p-6">{children}</main>
       </div>
     </div>

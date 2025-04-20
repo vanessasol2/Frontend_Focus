@@ -8,9 +8,10 @@ module.exports = {
       backgroundImage: {
         "button-primary": "linear-gradient(to right bottom, #5603ad, #6b25ba, #7f3dc8, #9253d5, #a568e3)",
       },
-      colors: {
-        "layout-bg": "#f6f8fc", 
+      colors: { 
         "content-bg": "#F7F8FA", 
+        "primary-color": "#5603ad",
+        "secundary-color":"#47038C"
       },
     },
   },

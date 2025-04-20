@@ -5,64 +5,52 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/slices/AuthSlice";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { useForm } from "react-hook-form"; 
 import agendar from "../../img/agendar.webp";
 
 export function LoginFormPaciente() {
-  const [mensajeError, setMensajeError] = useState("");
-  const [password, setPasswordValue] = useState("");
-  const [email, setEmailValue] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setError
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false
+    }
+  });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handlePasswordChange = (e) => setPasswordValue(e.target.value);
-  const handleEmailChange = (e) => setEmailValue(e.target.value);
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const handleRememberMeChange = () => setRememberMe(!rememberMe);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    // Validación personalizada antes de enviar
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setMensajeError("El formato del correo no es válido.");
-      return;
-    }
-
-    if (password.length < 6) {
-      setMensajeError("La contraseña debe tener al menos 6 caracteres.");
-      return;
-    }
-
-    setMensajeError("");
+  const onSubmit = async (data) => {
     setLoading(true);
-
-    const data = { email, password };
 
     try {
       const response = await axios.post(
         "http://localhost:8081/auth/login",
-        data
+        { email: data.email, password: data.password }
       );
 
-      if (response.data && response.data.token) {
+      if (response.data?.token) {
         const token = response.data.token;
 
-        if (rememberMe) {
-          localStorage.setItem("token", token);
-        } else {
-          sessionStorage.setItem("token", token);
-        }
+        
+        data.rememberMe 
+          ? localStorage.setItem("token", token) 
+          : sessionStorage.setItem("token", token);
 
         const decoded = jwtDecode(token);
-        const roles = Array.isArray(decoded.roles)
-          ? decoded.roles
-          : [decoded.roles];
-        const user = { email };
+        const roles = Array.isArray(decoded.roles) ? decoded.roles : [decoded.roles];
+        const user = { email: data.email };
 
         dispatch(login({ user, role: roles, token }));
 
@@ -73,20 +61,20 @@ export function LoginFormPaciente() {
         } else if (roles.includes("PSICOLOGO")) {
           navigate("/home-psicologo");
         } else {
-          setMensajeError("Acceso denegado. Rol no reconocido.");
+          setError("root", { message: "Acceso denegado. Rol no reconocido." });
         }
       } else {
-        setMensajeError("Usuario o contraseña incorrectos.");
+        setError("root", { message: "Usuario o contraseña incorrectos." });
       }
     } catch (error) {
       if (error.response) {
         if (error.response.status === 401) {
-          setMensajeError("Usuario o contraseña incorrectos");
+          setError("root", { message: "Usuario o contraseña incorrectos" });
         } else if (error.response.status === 500) {
-          setMensajeError("Error interno del servidor");
+          setError("root", { message: "Error interno del servidor" });
         }
       } else {
-        setMensajeError("No se pudo conectar con el servidor");
+        setError("root", { message: "No se pudo conectar con el servidor" });
       }
     } finally {
       setLoading(false);
@@ -96,14 +84,14 @@ export function LoginFormPaciente() {
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
       <div className="bg-white rounded-xl shadow-xl max-w-5xl w-full flex overflow-hidden">
-        {/* FORMULARIO */}
+        {/* Formulario*/}
         <div className="w-1/2 p-10 flex flex-col justify-center h-full">
           <h4 className="text-xl font-semibold text-[#5603AD]">Focus Frame</h4>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             ¡Bienvenidos!
           </h2>
 
-          <form className="space-y-4" onSubmit={handleLogin}>
+          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             {/* Input Email */}
             <div className="relative">
               <label htmlFor="email" className="sr-only">
@@ -116,16 +104,21 @@ export function LoginFormPaciente() {
               <input
                 id="email"
                 type="email"
-                placeholder="Correo electrónico"
-                value={email}
-                onChange={handleEmailChange}
-                required
+                placeholder="Ingrese su correo electrónico"
                 className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none transition-all
-                   ${mensajeError && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
-                    ? "border-red-500 focus:ring-red-500"
-                    : "focus:ring-2 focus:ring-[#5603AD]"
-                  }`}
+                  ${errors.email ? "border-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#5603AD]"}
+                `}
+                {...register("email", {
+                  required: "El correo electrónico es obligatorio",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "El formato del correo no es válido"
+                  }
+                })}
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
             {/* Input Contraseña */}
@@ -140,15 +133,17 @@ export function LoginFormPaciente() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="Contraseña"
-                value={password}
-                onChange={handlePasswordChange}
-                required
+                placeholder="Ingrese su contraseña"
                 className={`w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:outline-none transition-all 
-                  ${mensajeError && password.length < 6
-                    ? "border-red-500 focus:ring-red-500"
-                    : "focus:ring-2 focus:ring-[#5603AD]"
-                  }`}
+                  ${errors.password ? "border-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#5603AD]"}
+                `}
+                {...register("password", {
+                  required: "La contraseña es obligatoria",
+                  minLength: {
+                    value: 6,
+                    message: "La contraseña debe tener al menos 6 caracteres"
+                  }
+                })}
               />
               <button
                 type="button"
@@ -157,6 +152,9 @@ export function LoginFormPaciente() {
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+              )}
             </div>
 
             {/* Recordarme y Olvidé mi contraseña */}
@@ -164,14 +162,13 @@ export function LoginFormPaciente() {
               <label className="flex items-center text-gray-600 text-sm py-3">
                 <input
                   type="checkbox"
-                  checked={rememberMe}
-                  onChange={handleRememberMeChange}
+                  {...register("rememberMe")}
                   className="mr-2"
                 />
-                Remember me
+                Recordarme
               </label>
               <a
-                href="/forgot-password"
+                href="/olvide-contrasena"
                 className="text-sm text-[#5603AD] font-semibold hover:underline"
               >
                 ¿Olvidaste tu contraseña?
@@ -187,10 +184,10 @@ export function LoginFormPaciente() {
               {loading ? "Ingresando..." : "Iniciar Sesión"}
             </button>
 
-            {/* Mensaje de error */}
-            {mensajeError && (
+            {/* Mensaje de error general */}
+            {errors.root && (
               <p className="text-red-500 text-sm text-center mt-2">
-                {mensajeError}
+                {errors.root.message}
               </p>
             )}
           </form>
@@ -201,7 +198,7 @@ export function LoginFormPaciente() {
           </p>
         </div>
 
-        {/* IMAGEN */}
+        {/* Imagen */}
         <div className="w-1/2 button-primary flex flex-col items-center justify-center p-10 text-white rounded-r-3xl transition-all">
           <img
             src={agendar}

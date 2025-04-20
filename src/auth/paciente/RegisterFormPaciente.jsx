@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useForm } from "react-hook-form";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
 import agendar from "../../img/agendar.webp";
 
@@ -8,38 +9,33 @@ export function RegisterFormPaciente() {
   const { pacienteId } = useParams();
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8081";
   const navigate = useNavigate();
-
-  const [mensajeError, setMensajeError] = useState("");
-  const [register, setRegister] = useState({
-    username: "",
-    password: "",
-  });
   const [showPassword, setShowPassword] = useState(false);
-  const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [mensajeError, setMensajeError] = useState("");
 
-  const handleChange = (e) => {
-    setRegister({
-      ...register,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({
+    defaultValues: {
+      username: "",
+      password: "",
+      aceptaTerminos: false
+    }
+  });
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleCheckboxChange = () => {
-    setAceptaTerminos(!aceptaTerminos);
-  };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     if (!pacienteId) {
       alert("No tienes permiso para completar el perfil");
       return;
     }
 
-    if (!aceptaTerminos) {
+    if (!data.aceptaTerminos) {
       setMensajeError("Debes aceptar los Términos y Condiciones para continuar.");
       return;
     }
@@ -49,12 +45,15 @@ export function RegisterFormPaciente() {
     try {
       const response = await axios.post(
         `${API_URL}/paciente/completar-perfil/${pacienteId}`,
-        register,
+        {
+          username: data.username,
+          password: data.password
+        },
         { headers: { "Content-Type": "application/json" } }
       );
 
       alert("Perfil completado con éxito Paciente!");
-      setRegister({ username: "", password: "" });
+      reset();
       navigate("/login");
     } catch (error) {
       setMensajeError(error.response?.data || "Hubo un error al completar el perfil");
@@ -69,7 +68,7 @@ export function RegisterFormPaciente() {
           <h2 className="text-2xl font-bold text-gray-900">Completar Perfil</h2>
           <p className="text-gray-500 mb-6">Registra tu cuenta para acceder</p>
 
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
             {/* Input Usuario */}
             <div className="relative">
@@ -79,13 +78,22 @@ export function RegisterFormPaciente() {
               <User className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type="text"
-                name="username"
-                placeholder="Nombre de usuario"
-                value={register.username}
-                onChange={handleChange}
-                required
-                className="w-full p-3 pl-12 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#5603AD] focus:outline-none transition-all"
+                id="username"
+                placeholder="Ingrese su nombre de usuario"
+                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none transition-all ${
+                  errors.username ? "border-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#5603AD]"
+                }`}
+                {...register("username", {
+                  required: "El nombre de usuario es obligatorio",
+                  minLength: {
+                    value: 4,
+                    message: "El usuario debe tener al menos 4 caracteres"
+                  }
+                })}
               />
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-500">{errors.username.message}</p>
+              )}
             </div>
 
             {/* Input Contraseña */}
@@ -96,14 +104,19 @@ export function RegisterFormPaciente() {
               <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               <input
                 type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Contraseña"
-                value={register.password}
-                onChange={handleChange}
-                required
-                className="w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:ring-2 focus:ring-[#5603AD] focus:outline-none transition-all"
+                id="password"
+                placeholder="Ingrese su Contraseña"
+                className={`w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:outline-none transition-all ${
+                  errors.password ? "border-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#5603AD]"
+                }`}
+                {...register("password", {
+                  required: "La contraseña es obligatoria",
+                  minLength: {
+                    value: 6,
+                    message: "La contraseña debe tener al menos 6 caracteres"
+                  }
+                })}
               />
-
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
@@ -111,6 +124,9 @@ export function RegisterFormPaciente() {
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+              )}
             </div>
 
             {/* Checkbox para aceptar términos */}
@@ -118,9 +134,10 @@ export function RegisterFormPaciente() {
               <input
                 type="checkbox"
                 id="terminos"
-                checked={aceptaTerminos}
-                onChange={handleCheckboxChange}
                 className="w-4 h-4 cursor-pointer"
+                {...register("aceptaTerminos", {
+                  required: "Debes aceptar los términos y condiciones"
+                })}
               />
               <label htmlFor="terminos" className="text-sm text-gray-600">
                 Acepto los {" "}
@@ -132,12 +149,13 @@ export function RegisterFormPaciente() {
                 </a>.
               </label>
             </div>
+            {errors.aceptaTerminos && (
+              <p className="text-red-500 text-sm">{errors.aceptaTerminos.message}</p>
+            )}
 
             <button
               type="submit"
-              className={`w-full button-primary text-white py-3 rounded-lg transition-all ${!aceptaTerminos ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              disabled={!aceptaTerminos}
+              className="w-full button-primary text-white py-3 rounded-lg transition-all"
             >
               Guardar
             </button>

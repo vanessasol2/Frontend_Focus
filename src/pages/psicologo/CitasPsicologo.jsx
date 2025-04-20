@@ -1,15 +1,15 @@
-import { CalendarDays, X, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
-import { Link } from "react-router-dom";
-import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import { es } from "date-fns/locale";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
+import ModalCitaPsicologo from "../../components/citaPsicologo/ModalCitaPsicologo";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "../../components/citaPsicologo/CalendarioCita.css";
+import "../../components/citaPsicologo/CalendarioSelector.css";
 
 const localizer = dateFnsLocalizer({
   format,
@@ -26,34 +26,73 @@ const CitasPsicologo = () => {
     titulo: "",
     fecha: "",
     hora: "",
-    notas: ""
+    notas: "",
   });
   const [error, setError] = useState("");
+  const [psicologoId] = useState(1); 
+
+  
+  useEffect(() => {
+    const cargarCitas = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/citas/psicologo/${pacienteId}`);
+        if (!response.ok) throw new Error('Error al cargar citas');
+        
+        const citas = await response.json();
+        
+        const eventosFormateados = citas.map(cita => ({
+          id: cita.id,
+          title: `${format(new Date(cita.start), 'HH:mm')} - ${cita.paciente?.nombre || cita.titulo}`,
+          start: new Date(cita.start),
+          end: new Date(cita.end),
+          paciente: cita.paciente || { nombre: cita.titulo },
+          notas: cita.notas,
+          agendadaPorPaciente: cita.agendadaPorPaciente,
+          style: {
+            backgroundColor: cita.agendadaPorPaciente ? '#a847ba' : '#5603ad',
+            color: 'white',
+            borderRadius: '4px',
+            border: 'none'
+          }
+        }));
+        
+        setEventos(eventosFormateados);
+      } catch (error) {
+        console.error("Error cargando citas:", error);
+        setError("Error al cargar las citas");
+      }
+    };
+    
+    cargarCitas();
+  }, [psicologoId]);
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
-    setFormulario(prev => ({ ...prev, [name]: value }));
+    setFormulario((prev) => ({ ...prev, [name]: value }));
     setError("");
   };
 
-  const tieneConflicto = useCallback((inicio, fin) => {
-    return eventos.some(evento => {
-      const eventoInicio = new Date(evento.start);
-      const eventoFin = new Date(evento.end);
-      const nuevoInicio = new Date(inicio);
-      const nuevoFin = new Date(fin);
-      
-      return (
-        (nuevoInicio >= eventoInicio && nuevoInicio < eventoFin) ||
-        (nuevoFin > eventoInicio && nuevoFin <= eventoFin) ||
-        (nuevoInicio <= eventoInicio && nuevoFin >= eventoFin)
-      );
-    });
-  }, [eventos]);
+  const tieneConflicto = useCallback(
+    (inicio, fin) => {
+      return eventos.some((evento) => {
+        const eventoInicio = new Date(evento.start);
+        const eventoFin = new Date(evento.end);
+        const nuevoInicio = new Date(inicio);
+        const nuevoFin = new Date(fin);
 
-  const agregarEvento = () => {
+        return (
+          (nuevoInicio >= eventoInicio && nuevoInicio < eventoFin) ||
+          (nuevoFin > eventoInicio && nuevoFin <= eventoFin) ||
+          (nuevoInicio <= eventoInicio && nuevoFin >= eventoFin)
+        );
+      });
+    },
+    [eventos]
+  );
+
+  const agregarEvento = async () => {
     const { titulo, fecha, hora } = formulario;
-    
+
     if (!titulo || !fecha || !hora) {
       setError("Por favor completa todos los campos obligatorios");
       return;
@@ -72,23 +111,51 @@ const CitasPsicologo = () => {
       return;
     }
 
-    const nuevoEvento = {
-      id: Date.now(),
-      title: `${inicio.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' })} - ${titulo}`,
-      start: inicio,
-      end: fin,
-      paciente: titulo,
-      notas: formulario.notas
-    };
+    try {
+      const response = await fetch('http://localhost:8080/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          titulo: titulo,
+          start: inicio.toISOString(),
+          end: fin.toISOString(),
+          notas: formulario.notas,
+          psicologoId: psicologoId,
+          agendadaPorPaciente: false 
+        }),
+      });
 
-    setEventos([...eventos, nuevoEvento]);
-    setModalAbierto(false);
-    setFormulario({
-      titulo: "",
-      fecha: "",
-      hora: "",
-      notas: ""
-    });
+      if (!response.ok) throw new Error('Error al guardar');
+
+      
+      const nuevaCita = await response.json();
+      setEventos(prev => [...prev, {
+        id: nuevaCita.id,
+        title: `${format(inicio, 'HH:mm')} - ${titulo}`,
+        start: inicio,
+        end: fin,
+        paciente: { nombre: titulo },
+        notas: formulario.notas,
+        agendadaPorPaciente: false,
+        style: {
+          backgroundColor: '#5603ad',
+          color: 'white'
+        }
+      }]);
+      
+      setModalAbierto(false);
+      setFormulario({
+        titulo: "",
+        fecha: "",
+        hora: "",
+        notas: "",
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Error al guardar la cita");
+    }
   };
 
   const dayPropGetter = (date) => {
@@ -97,142 +164,92 @@ const CitasPsicologo = () => {
     const esHoy = date.toDateString() === hoy.toDateString();
 
     return {
-      className: esPasado 
-        ? 'dia-pasado' 
-        : esHoy 
-          ? 'dia-actual' 
-          : ''
+      className: esPasado ? "dia-pasado" : esHoy ? "dia-actual" : "",
     };
   };
 
-  const EventoCalendario = ({ event }) => {  
-    if (!event) return null;  
-    
+  const EventoCalendario = ({ event }) => {
+    if (!event) return null;
+
     return (
-      <div className="evento-calendario">
+      <div className="evento-calendario" style={event.style}>
         <div className="evento-contenido">
-          <strong>{event.title.split(" - ")[1]}</strong>
-          <small>{event.title.split(" - ")[0]}</small>
+          <strong>{event.paciente.nombre}</strong>
+          <small>{format(event.start, 'HH:mm')} - {format(event.end, 'HH:mm')}</small>
           {event.notas && <p className="notas-evento">{event.notas}</p>}
+          <span className="agendado-por">
+            {event.agendadaPorPaciente ? "Agendado por paciente" : "Agendado por psicólogo"}
+          </span>
         </div>
       </div>
     );
   };
 
+  const exportarCitas = () => {
+    const csvContent = [
+      "Paciente,Fecha Inicio,Fecha Fin,Notas,Agendado por",
+      ...eventos.map(
+        (e) =>
+          `"${e.paciente.nombre}","${format(e.start, "yyyy-MM-dd HH:mm")}","${format(
+            e.end,
+            "yyyy-MM-dd HH:mm"
+          )}","${e.notas || ""}","${e.agendadaPorPaciente ? 'Paciente' : 'Psicólogo'}"`
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `citas-psicologo-${format(new Date(), "yyyyMMdd")}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <MainLayoutPsicologo>
-      <div className="p-4 mt-8">
-        <div className="flex justify-end mb-2">
-          <button
-            className="bg-[#5603ad] text-white py-2 px-6 rounded-lg hover:bg-[#47038C] transition-all duration-300 flex items-center gap-2"
-            onClick={() => setModalAbierto(true)}
-          >
-            <CalendarDays className="w-5 h-5" /> 
-            Agendar nueva cita
-          </button>
+      <div className="p-4 mt-7">
+        <h1 className="text-xl font-semibold text-gray-800">Gestión de Citas</h1>
+        <div className="flex justify-between mb-4">
+          <div className="flex gap-2">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-[#5603ad] mr-1"></div>
+              <span className="text-sm">Citas propias</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-[#a847ba] mr-1"></div>
+              <span className="text-sm">Citas de pacientes</span>
+            </div>
+          </div>
+          <div className="flex gap-x-4">
+            <button
+              onClick={exportarCitas}
+              className="bg-green-700 text-white py-2 px-6 rounded-lg hover:bg-green-800 transition-all duration-300 flex items-center gap-2"
+            >
+              Exportar a CSV
+            </button>
+            <button
+              className="bg-primary-color text-white py-2 px-6 rounded-lg hover:bg-secundary-color transition-all duration-300 flex items-center gap-2"
+              onClick={() => setModalAbierto(true)}
+            >
+              <CalendarDays className="w-5 h-5" />
+              Agendar nueva cita
+            </button>
+          </div>
         </div>
 
         {modalAbierto && (
-          <div className="modal-overlay">
-            <div className="modal-container">
-              <div className="modal-header">
-                <h2 className="modal-title">Agendar nueva cita</h2>
-                <button 
-                  onClick={() => {
-                    setModalAbierto(false);
-                    setError("");
-                  }}
-                  className="modal-close-button"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-
-              <div className="modal-content">
-                {error && <div className="modal-error">{error}</div>}
-
-                <div className="form-group">
-                  <label className="form-label">
-                    Paciente <span className="required">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="titulo"
-                    value={formulario.titulo}
-                    onChange={manejarCambio}
-                    className="form-input"
-                    placeholder="Nombre del paciente"
-                    required
-                  />
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">
-                      Fecha <span className="required">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      name="fecha"
-                      value={formulario.fecha}
-                      onChange={manejarCambio}
-                      className="form-input"
-                      min={new Date().toISOString().split('T')[0]}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">
-                      Hora <span className="required">*</span>
-                    </label>
-                    <input
-                      type="time"
-                      name="hora"
-                      value={formulario.hora}
-                      onChange={manejarCambio}
-                      className="form-input"
-                      min="09:00"
-                      max="18:00"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Notas adicionales</label>
-                  <textarea
-                    name="notas"
-                    value={formulario.notas}
-                    onChange={manejarCambio}
-                    className="form-textarea"
-                    placeholder="Observaciones o detalles importantes"
-                    rows="3"
-                  />
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setModalAbierto(false);
-                    setError("");
-                  }}
-                  className="btn btn-secondary"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={agregarEvento}
-                  className="bg-[#5603ad] text-white text-sm px-4 py-2 rounded-lg hover:bg-[#47038C] transition"
-                >
-                  Guardar cita
-                </button>
-              </div>
-            </div>
-          </div>
+          <ModalCitaPsicologo
+            formulario={formulario}
+            manejarCambio={manejarCambio}
+            agregarEvento={agregarEvento}
+            cerrarModal={() => {
+              setModalAbierto(false);
+              setError("");
+            }}
+            error={error}
+          />
         )}
 
         <div className="calendario-contenedor">
@@ -242,7 +259,7 @@ const CitasPsicologo = () => {
             startAccessor="start"
             endAccessor="end"
             defaultView="month"
-            views={["month", "week", "day"]}
+            views={["month"]}
             defaultDate={new Date()}
             style={{ height: 600 }}
             messages={{
@@ -259,8 +276,11 @@ const CitasPsicologo = () => {
             }}
             dayPropGetter={dayPropGetter}
             components={{
-              event: EventoCalendario
+              event: EventoCalendario,
             }}
+            eventPropGetter={(event) => ({
+              style: event.style
+            })}
           />
         </div>
       </div>

@@ -30,7 +30,7 @@ function App() {
       {/* Rutas públicas */}
       <Route path="/login" element={<LoginFormPaciente />} />
       <Route path="/olvide-contrasena" element={<OlvideContrasena />} />
-      <Route path="/restablecer-contrasena" element={<RestablecerContrasena />} />
+      <Route path="/auth/recuperar-contrasena" element={<RestablecerContrasena />} />
       <Route path="/register/:pacienteId" element={<RegisterFormPaciente />} />
       <Route path="/register-psicologo" element={<RegisterFormPsicologo />} />
       <Route path="/politica-de-privacidad" element={<PoliticaPrivacidad />} />

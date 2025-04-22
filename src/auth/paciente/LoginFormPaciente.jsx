@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../redux/slices/AuthSlice";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import { useForm } from "react-hook-form"; 
+import { useForm } from "react-hook-form";
 import agendar from "../../img/agendar.webp";
 
 export function LoginFormPaciente() {
@@ -14,18 +14,18 @@ export function LoginFormPaciente() {
     handleSubmit,
     formState: { errors },
     watch,
-    setError
+    setError,
   } = useForm({
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: false
-    }
+      rememberMe: false,
+    },
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -35,21 +35,22 @@ export function LoginFormPaciente() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8081/auth/login",
-        { email: data.email, password: data.password }
-      );
+      const response = await axios.post("http://localhost:8081/auth/login", {
+        email: data.email,
+        password: data.password,
+      });
 
       if (response.data?.token) {
         const token = response.data.token;
 
-        
-        data.rememberMe 
-          ? localStorage.setItem("token", token) 
+        data.rememberMe
+          ? localStorage.setItem("token", token)
           : sessionStorage.setItem("token", token);
 
         const decoded = jwtDecode(token);
-        const roles = Array.isArray(decoded.roles) ? decoded.roles : [decoded.roles];
+        const roles = Array.isArray(decoded.roles)
+          ? decoded.roles
+          : [decoded.roles];
         const user = { email: data.email };
 
         dispatch(login({ user, role: roles, token }));
@@ -86,78 +87,94 @@ export function LoginFormPaciente() {
       <div className="bg-white rounded-xl shadow-xl max-w-5xl w-full flex overflow-hidden">
         {/* Formulario*/}
         <div className="w-1/2 p-10 flex flex-col justify-center h-full">
-          <h4 className="text-xl font-semibold text-[#5603AD]">Focus Frame</h4>
+          <h4 className="text-xl font-semibold text-primary-color">Focus Frame</h4>
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
             ¡Bienvenidos!
           </h2>
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            {/* Input Email */}
-            <div className="relative">
-              <label htmlFor="email" className="sr-only">
-                Correo electrónico
-              </label>
-              <Mail
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                id="email"
-                type="email"
-                placeholder="Ingrese su correo electrónico"
-                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none transition-all
-                  ${errors.email ? "border-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#5603AD]"}
-                `}
-                {...register("email", {
-                  required: "El correo electrónico es obligatorio",
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: "El formato del correo no es válido"
-                  }
-                })}
-              />
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+            {/* Input Email  */}
+            <div>
+              <div className="relative">
+                <label htmlFor="email" className="sr-only">
+                  Correo electrónico
+                </label>
+                <Mail
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Ingrese su correo electrónico"
+                  className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none transition-all
+          ${
+            errors.email
+              ? "border-red-500"
+              : "border-gray-300 focus:ring-2 focus:ring-primary-color"
+          }
+        `}
+                  {...register("email", {
+                    required: "El correo electrónico es obligatorio",
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "El formato del correo no es válido",
+                    },
+                  })}
+                />
+              </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                <p className="mt-1 ml-1 text-sm text-red-500">
+                  {errors.email.message}
+                </p>
               )}
             </div>
 
             {/* Input Contraseña */}
-            <div className="relative">
-              <label htmlFor="password" className="sr-only">
-                Contraseña
-              </label>
-              <Lock
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Ingrese su contraseña"
-                className={`w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:outline-none transition-all 
-                  ${errors.password ? "border-red-500" : "border-gray-300 focus:ring-2 focus:ring-[#5603AD]"}
-                `}
-                {...register("password", {
-                  required: "La contraseña es obligatoria",
-                  minLength: {
-                    value: 6,
-                    message: "La contraseña debe tener al menos 6 caracteres"
-                  }
-                })}
-              />
-              <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+            <div>
+              <div className="relative">
+                <label htmlFor="password" className="sr-only">
+                  Contraseña
+                </label>
+                <Lock
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Ingrese su contraseña"
+                  className={`w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:outline-none transition-all 
+          ${
+            errors.password
+              ? "border-red-500"
+              : "border-gray-300 focus:ring-2 focus:ring-primary-color"
+          }
+        `}
+                  {...register("password", {
+                    required: "La contraseña es obligatoria",
+                    minLength: {
+                      value: 6,
+                      message: "La contraseña debe tener al menos 6 caracteres",
+                    },
+                  })}
+                />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+                <p className="mt-1 ml-1 text-sm text-red-500">
+                  {errors.password.message}
+                </p>
               )}
             </div>
 
-            {/* Recordarme y Olvidé mi contraseña */}
+            {/* Recordarme */}
             <div className="flex items-center justify-between">
               <label className="flex items-center text-gray-600 text-sm py-3">
                 <input
@@ -169,13 +186,12 @@ export function LoginFormPaciente() {
               </label>
               <a
                 href="/olvide-contrasena"
-                className="text-sm text-[#5603AD] font-semibold hover:underline"
+                className="text-sm text-primary-color font-semibold hover:underline"
               >
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
 
-            {/* Botón de Login */}
             <button
               type="submit"
               className="w-full text-white py-3 rounded-lg transition-all button-primary"
@@ -184,7 +200,6 @@ export function LoginFormPaciente() {
               {loading ? "Ingresando..." : "Iniciar Sesión"}
             </button>
 
-            {/* Mensaje de error general */}
             {errors.root && (
               <p className="text-red-500 text-sm text-center mt-2">
                 {errors.root.message}
@@ -199,17 +214,23 @@ export function LoginFormPaciente() {
         </div>
 
         {/* Imagen */}
-        <div className="w-1/2 button-primary flex flex-col items-center justify-center p-10 text-white rounded-r-3xl transition-all">
-          <img
-            src={agendar}
-            className="w-80 h-auto rounded-lg shadow-lg transform hover:scale-105 transition-transform"
-            alt="Focus Frame"
-          />
-          <p className="text-center text-white mt-4 text-lg">
-            Con <span className="font-bold text-[#f0e1ff]">FocusFrame</span>,
-            administra tu calendario, citas y archivos de cliente desde una
-            interfaz unificada.
-          </p>
+        <div className="w-1/2 flex flex-col items-center justify-center p-8 bg-button-primary rounded-xl">
+          <div className="mb-6 overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+            <img
+              src={agendar}
+              className="w-80 h-auto object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500"
+              alt="Focus Frame"
+            />
+          </div>
+          <div className="text-center max-w-xs">
+            <p className="text-white text-base leading-relaxed">
+              Con{" "}
+              <span className="font-semibold text-secundary-color">
+                FocusFrame
+              </span>
+              administra tu calendario, citas y archivos de tu paciente desde una interfaz unificada.
+            </p>
+          </div>
         </div>
       </div>
     </main>

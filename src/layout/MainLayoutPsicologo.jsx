@@ -1,5 +1,5 @@
 import Sidebar from "../layout/SidebarPsicologo";
-import HeaderMedico from "../layout/HeaderMedico";
+import HeaderMedico from "./HeaderPsicologo";
 
 const MainLayoutPsicologo = ({ children }) => {
   return (

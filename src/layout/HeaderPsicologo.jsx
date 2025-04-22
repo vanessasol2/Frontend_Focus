@@ -2,7 +2,7 @@ import { useLocation, Link } from "react-router-dom";
 import Notificaciones from "../components/header/Notifications";
 import "../layout/style/Header.css";
 
-const HeaderMedico = () => {
+const HeaderPsicologo = () => {
   const location = useLocation();
 
   
@@ -84,4 +84,4 @@ const HeaderMedico = () => {
   );
 };
 
-export default HeaderMedico;
+export default HeaderPsicologo;

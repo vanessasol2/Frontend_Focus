@@ -67,7 +67,9 @@ export function RegisterFormPaciente() {
     <main className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
       <div className="bg-white rounded-xl shadow-xl max-w-5xl w-full flex overflow-hidden">
         <div className="w-1/2 p-10 flex flex-col justify-center h-full">
-          <h4 className="text-xl font-semibold text-primary-color">Focus Frame</h4>
+          <h4 className="text-xl font-semibold text-primary-color">
+            Focus Frame
+          </h4>
           <h2 className="text-2xl font-bold text-gray-900">Completar Perfil</h2>
           <p className="text-gray-500 mb-6">Registra tu cuenta para acceder</p>
 
@@ -195,21 +197,31 @@ export function RegisterFormPaciente() {
         </div>
 
         {/* Imagen */}
-        <div className="w-1/2 flex flex-col items-center justify-center p-8 bg-button-primary rounded-xl">
-          <div className="mb-6 overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/2 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-button-primary rounded-xl transition-all duration-300 hover:shadow-lg hover:bg-button-primary/90">
+          {/* Contenedor de la imagen  */}
+          <figure className="mb-6 w-full max-w-xs md:max-w-sm overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-500">
             <img
               src={agendar}
-              className="w-80 h-auto object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500"
-              alt="Focus Frame"
+              className="w-full h-auto aspect-video object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500"
+              alt="Focus Frame - Administración de calendario y citas psciologicas"
+              loading="lazy"
+              width={320}
+              height={180}
             />
-          </div>
-          <div className="text-center max-w-xs">
-            <p className="text-white text-base leading-relaxed">
+            <figcaption className="sr-only">
+              Interfaz de FocusFrame para administración psciologica
+            </figcaption>
+          </figure>
+
+          {/* Contenedor de texto  */}
+          <div className="text-center max-w-xs md:max-w-sm">
+            <p className="text-white text-sm sm:text-base leading-relaxed">
               Con{" "}
-              <span className="font-semibold text-secundary-color">
+              <span className="font-semibold text-secundary-color hover:text-secundary-color/80 transition-colors">
                 FocusFrame
               </span>
-              administra tu calendario, citas y archivos de tu paciente desde una interfaz unificada.
+              , administra tu calendario, citas y archivos de pacientes desde
+              una interfaz unificada.
             </p>
           </div>
         </div>

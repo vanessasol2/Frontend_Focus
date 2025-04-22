@@ -2,66 +2,67 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import { User, Mail, Lock, Eye, EyeOff, FileUser, BriefcaseBusiness, BookUser } from "lucide-react";
+import {User,Mail,Lock,Eye,EyeOff,FileUser,BriefcaseBusiness,BookUser,} from "lucide-react";
 import agendar from "../../img/agendar.webp";
 import { errorMessages, getBackendMessage } from "../../utils/errorMessages";
+import { toast, Toaster } from 'sonner';
 
 const tiposDocumento = [
   { value: "CC", label: "Cédula de Ciudadanía" },
   { value: "CE", label: "Cédula de Extranjería" },
   { value: "TI", label: "Tarjeta de Identidad" },
   { value: "PA", label: "Pasaporte" },
-  { value: "RC", label: "Registro Civil" }
+  { value: "RC", label: "Registro Civil" },
 ];
 
 const validationRules = {
   nombre: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     minLength: {
       value: 2,
-      message: errorMessages['validation.minLength'].replace('{min}', '2')
+      message: errorMessages["validation.minLength"].replace("{min}", "2"),
     },
     maxLength: {
       value: 50,
-      message: errorMessages['validation.maxLength'].replace('{max}', '50')
-    }
+      message: errorMessages["validation.maxLength"].replace("{max}", "50"),
+    },
   },
   apellido: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     minLength: {
       value: 2,
-      message: errorMessages['validation.minLength'].replace('{min}', '2')
+      message: errorMessages["validation.minLength"].replace("{min}", "2"),
     },
     maxLength: {
       value: 50,
-      message: errorMessages['validation.maxLength'].replace('{max}', '50')
-    }
+      message: errorMessages["validation.maxLength"].replace("{max}", "50"),
+    },
   },
   username: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     minLength: {
       value: 4,
-      message: errorMessages['validation.minLength'].replace('{min}', '4')
+      message: errorMessages["validation.minLength"].replace("{min}", "4"),
     },
     maxLength: {
       value: 20,
-      message: errorMessages['validation.maxLength'].replace('{max}', '20')
+      message: errorMessages["validation.maxLength"].replace("{max}", "20"),
     },
     pattern: {
       value: /^[a-zA-Z0-9_]+$/,
-      message: errorMessages['validation.username']
-    }
+      message: errorMessages["validation.username"],
+    },
   },
   tipoDocumento: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
   },
   fechaNacimiento: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     validate: {
       validDate: (value) => {
-        if (!value) return true; 
+        if (!value) return true;
         const date = new Date(value);
-        return !isNaN(date.getTime()) || 'Fecha no válida';
+        return !isNaN(date.getTime()) || "Fecha no válida";
       },
       minAge: (value) => {
         if (!value) return true;
@@ -69,58 +70,61 @@ const validationRules = {
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
           age--;
         }
-        return age >= 18 || 'Debes tener al menos 18 años';
+        return age >= 18 || "Debes tener al menos 18 años";
       },
       notFuture: (value) => {
         if (!value) return true;
         const selectedDate = new Date(value);
         const today = new Date();
-        return selectedDate <= today || 'La fecha no puede ser futura';
-      }
-    }
+        return selectedDate <= today || "La fecha no puede ser futura";
+      },
+    },
   },
   email: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     pattern: {
       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: errorMessages['validation.email']
-    }
+      message: errorMessages["validation.email"],
+    },
   },
   password: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     minLength: {
       value: 6,
-      message: errorMessages['validation.password']
+      message: errorMessages["validation.password"],
     },
     maxLength: {
       value: 30,
-      message: errorMessages['validation.maxLength'].replace('{max}', '30')
-    }
+      message: errorMessages["validation.maxLength"].replace("{max}", "30"),
+    },
   },
   especialidad: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     maxLength: {
       value: 100,
-      message: errorMessages['validation.maxLength'].replace('{max}', '100')
-    }
+      message: errorMessages["validation.maxLength"].replace("{max}", "100"),
+    },
   },
   experiencia: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     maxLength: {
       value: 500,
-      message: errorMessages['validation.maxLength'].replace('{max}', '500')
-    }
+      message: errorMessages["validation.maxLength"].replace("{max}", "500"),
+    },
   },
   licencia: {
-    required: errorMessages['validation.required'],
+    required: errorMessages["validation.required"],
     pattern: {
       value: /^[a-zA-Z0-9-]+$/,
-      message: errorMessages['validation.licencia']
-    }
-  }
+      message: errorMessages["validation.licencia"],
+    },
+  },
 };
 
 const InputField = ({
@@ -136,9 +140,9 @@ const InputField = ({
   showPasswordToggle = false,
   showPassword = false,
   onTogglePassword = null,
-  className = ""
+  className = "",
 }) => (
-  <div className={`relative mb-6 ${className}`}>
+  <div className={`relative mb-7 ${className}`}>
     <label htmlFor={id} className="sr-only">
       {label}
     </label>
@@ -151,12 +155,14 @@ const InputField = ({
     {type === "select" ? (
       <select
         id={id}
-        className={`w-full p-3 ${Icon ? 'pl-12' : 'pl-4'} border rounded-lg shadow-sm focus:ring-2 focus:ring-primary-color focus:outline-none transition-all ${
+        className={`w-full p-3 ${
+          Icon ? "pl-12" : "pl-4"
+        } border rounded-lg shadow-sm focus:ring-2 focus:ring-primary-color focus:outline-none transition-all ${
           errors ? "border-red-500" : "border-gray-300"
         }`}
         {...register(id, validation)}
       >
-        <option value="">{placeholder || 'Seleccione una opción'}</option>
+        <option value="">{placeholder || "Seleccione una opción"}</option>
         {options?.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
@@ -168,27 +174,29 @@ const InputField = ({
         id={id}
         type={type}
         placeholder={placeholder}
-        className={`w-full p-3 ${Icon ? 'pl-12' : 'pl-4'} pr-${
-          showPasswordToggle ? '12' : '3'
+        className={`w-full p-3 ${Icon ? "pl-12" : "pl-4"} pr-${
+          showPasswordToggle ? "12" : "3"
         } border rounded-lg shadow-sm focus:ring-2 focus:ring-primary-color focus:outline-none transition-all ${
           errors ? "border-purple-400" : "border-gray-300"
         }`}
         {...register(id, validation)}
-        max={type === 'date' ? new Date().toISOString().split('T')[0] : undefined}
+        max={
+          type === "date" ? new Date().toISOString().split("T")[0] : undefined
+        }
       />
     )}
     {showPasswordToggle && (
       <button
         type="button"
         onClick={onTogglePassword}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 "
         aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
       >
         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
       </button>
     )}
     {errors && (
-      <p className="absolute -bottom-5 left-0 text-sm text-red-500">
+      <p className="absolute   -bottom-5 left-0 text-sm text-red-500">
         {errors.message}
       </p>
     )}
@@ -208,7 +216,7 @@ export function RegisterFormPsicologo() {
       nombre: "",
       apellido: "",
       username: "",
-      tipoDocumento:"",
+      tipoDocumento: "",
       fechaNacimiento: "",
       email: "",
       password: "",
@@ -230,14 +238,18 @@ export function RegisterFormPsicologo() {
   
     try {
       if (step === 1) {
-        const response = await axios.post(`http://localhost:8081/funcionario/paso1`, {
-          nombre: data.nombre.trim(),
-          apellido: data.apellido.trim()
-        }, {
-          headers: {
-            'Content-Type': 'application/json'
+        const response = await axios.post(
+          `http://localhost:8081/funcionario/paso1`,
+          {
+            nombre: data.nombre.trim(),
+            apellido: data.apellido.trim(),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
         setPsicologoId(response.data);
         setStep(2);
       } else if (step === 2) {
@@ -246,15 +258,15 @@ export function RegisterFormPsicologo() {
           {
             psicologoId,
             tipoDocumento: data.tipoDocumento,
-            fechaNacimiento:data.fechaNacimiento, 
+            fechaNacimiento: data.fechaNacimiento,
             username: data.username.trim(),
             email: data.email.trim(),
-            password: data.password
+            password: data.password,
           },
           {
             headers: {
-              'Content-Type': 'application/json'
-            }
+              "Content-Type": "application/json",
+            },
           }
         );
         setStep(3);
@@ -265,26 +277,33 @@ export function RegisterFormPsicologo() {
             psicologoId,
             especialidad: data.especialidad.trim(),
             experiencia: data.experiencia.trim(),
-            licencia: data.licencia.trim()
+            licencia: data.licencia.trim(),
           },
           {
             headers: {
-              'Content-Type': 'application/json'
-            }
+              "Content-Type": "application/json",
+            },
           }
         );
-        alert("¡Registro completado con éxito!");
+        toast.success('Registro completado con éxito', {
+          description: 'Ahora puedes iniciar sesión con tus credenciales',
+          duration: 5000,
+          position: 'top-center',
+        });
+        
         reset();
         navigate("/login");
       }
     } catch (error) {
       console.error("Error en el registro:", error);
-      setMensajeError(getBackendMessage(error));
+      const errorMessage = getBackendMessage(error);
+      setMensajeError(errorMessage);
     }
   };
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
+      <Toaster richColors expand={true} />
       <div className="bg-white rounded-xl shadow-xl max-w-5xl w-full flex overflow-hidden">
         {/* Formulario */}
         <div className="w-1/2 p-10 flex flex-col justify-center h-full">
@@ -321,7 +340,9 @@ export function RegisterFormPsicologo() {
             ))}
           </div>
 
-          <h4 className="text-xl font-semibold text-primary-color">Focus Frame</h4>
+          <h4 className="text-xl font-semibold text-primary-color">
+            Focus Frame
+          </h4>
           <h2 className="text-2xl font-bold text-gray-900">
             {step === 3
               ? "Completa tu Perfil"
@@ -337,86 +358,86 @@ export function RegisterFormPsicologo() {
               : "Ingresa tu nombre y apellido."}
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {step === 1 && (
-          <>
-            <InputField
-              id="nombre"
-              label="Nombre"
-              icon={User}
-              placeholder="Ingrese su nombre"
-              register={register}
-              errors={errors.nombre}
-              validation={validationRules.nombre}
-            />
-            <InputField
-              id="apellido"
-              label="Apellido"
-              icon={User}
-              placeholder="Ingrese su apellido"
-              register={register}
-              errors={errors.apellido}
-              validation={validationRules.apellido}
-            />
-          </>
-        )}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {step === 1 && (
+              <>
+                <InputField
+                  id="nombre"
+                  label="Nombre"
+                  icon={User}
+                  placeholder="Ingrese tu nombre"
+                  register={register}
+                  errors={errors.nombre}
+                  validation={validationRules.nombre}
+                />
+                <InputField
+                  id="apellido"
+                  label="Apellido"
+                  icon={User}
+                  placeholder="Ingrese tu apellido"
+                  register={register}
+                  errors={errors.apellido}
+                  validation={validationRules.apellido}
+                />
+              </>
+            )}
 
-        {step === 2 && (
-          <>
-            <InputField
-              id="tipoDocumento"
-              label="Tipo de documento"
-              icon={FileUser}
-              type="select"
-              placeholder="Seleccione su tipo de documento"
-              options={tiposDocumento}
-              register={register}
-              errors={errors.tipoDocumento}
-              validation={validationRules.tipoDocumento}
-            />
-            <InputField
-      id="fechaNacimiento"
-      label="Fecha de Nacimiento"
-      type="date"
-      placeholder="Seleccione su fecha de nacimiento"
-      register={register}
-      errors={errors.fechaNacimiento}
-      validation={validationRules.fechaNacimiento}
-    />
-            <InputField
-              id="username"
-              label="Nombre de usuario"
-              icon={User}
-              placeholder="Ingrese su usuario"
-              register={register}
-              errors={errors.username}
-              validation={validationRules.username}
-            />
-            <InputField
-              id="email"
-              label="Correo electrónico"
-              icon={Mail}
-              type="email"
-              placeholder="Ingrese su correo electrónico"
-              register={register}
-              errors={errors.email}
-              validation={validationRules.email}
-            />
-            <InputField
-              id="password"
-              label="Contraseña"
-              icon={Lock}
-              type={showPassword ? "text" : "password"}
-              placeholder="Ingrese su contraseña"
-              register={register}
-              errors={errors.password}
-              validation={validationRules.password}
-              showPasswordToggle={true}
-              showPassword={showPassword}
-              onTogglePassword={togglePasswordVisibility}
-            />
-          </>
-        )}
+            {step === 2 && (
+              <>
+                <InputField
+                  id="tipoDocumento"
+                  label="Tipo de documento"
+                  icon={FileUser}
+                  type="select"
+                  placeholder="Seleccione tu tipo de documento"
+                  options={tiposDocumento}
+                  register={register}
+                  errors={errors.tipoDocumento}
+                  validation={validationRules.tipoDocumento}
+                />
+                <InputField
+                  id="fechaNacimiento"
+                  label="Fecha de Nacimiento"
+                  type="date"
+                  placeholder="Seleccione tu fecha de nacimiento"
+                  register={register}
+                  errors={errors.fechaNacimiento}
+                  validation={validationRules.fechaNacimiento}
+                />
+                <InputField
+                  id="username"
+                  label="Nombre de usuario"
+                  icon={User}
+                  placeholder="Ingrese tu usuario"
+                  register={register}
+                  errors={errors.username}
+                  validation={validationRules.username}
+                />
+                <InputField
+                  id="email"
+                  label="Correo electrónico"
+                  icon={Mail}
+                  type="email"
+                  placeholder="Ingrese tu correo electrónico"
+                  register={register}
+                  errors={errors.email}
+                  validation={validationRules.email}
+                />
+                <InputField
+                  id="password"
+                  label="Contraseña"
+                  icon={Lock}
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Ingrese tu contraseña"
+                  register={register}
+                  errors={errors.password}
+                  validation={validationRules.password}
+                  showPasswordToggle={true}
+                  showPassword={showPassword}
+                  onTogglePassword={togglePasswordVisibility}
+                />
+              </>
+            )}
 
             {step === 3 && (
               <>
@@ -424,7 +445,7 @@ export function RegisterFormPsicologo() {
                   id="especialidad"
                   label="Especialidad"
                   icon={BriefcaseBusiness}
-                  placeholder="Ingrese su especialidad"
+                  placeholder="Ingrese tu especialidad"
                   register={register}
                   errors={errors.especialidad}
                   validation={validationRules.especialidad}
@@ -433,7 +454,7 @@ export function RegisterFormPsicologo() {
                   id="experiencia"
                   label="Experiencia"
                   icon={FileUser}
-                  placeholder="Ingrese su experiencia"
+                  placeholder="Ingrese tu experiencia"
                   register={register}
                   errors={errors.experiencia}
                   validation={validationRules.experiencia}
@@ -442,7 +463,7 @@ export function RegisterFormPsicologo() {
                   id="licencia"
                   label="Licencia"
                   icon={BookUser}
-                  placeholder="Ingrese su licencia"
+                  placeholder="Ingrese tu licencia"
                   register={register}
                   errors={errors.licencia}
                   validation={validationRules.licencia}
@@ -486,21 +507,31 @@ export function RegisterFormPsicologo() {
         </div>
 
         {/* Imagen */}
-        <div className="w-1/2 flex flex-col items-center justify-center p-8 bg-button-primary rounded-xl">
-          <div className="mb-6 overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/2 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-button-primary rounded-xl transition-all duration-300 hover:shadow-lg hover:bg-button-primary/90">
+          {/* Contenedor de la imagen  */}
+          <figure className="mb-6 w-full max-w-xs md:max-w-sm overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-500">
             <img
               src={agendar}
-              className="w-80 h-auto object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500"
-              alt="Focus Frame"
+              className="w-full h-auto aspect-video object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500"
+              alt="Focus Frame - Administración de calendario y citas psciologicas"
+              loading="lazy"
+              width={320}
+              height={180}
             />
-          </div>
-          <div className="text-center max-w-xs">
-            <p className="text-white text-base leading-relaxed">
+            <figcaption className="sr-only">
+              Interfaz de FocusFrame para administración psciologica
+            </figcaption>
+          </figure>
+
+          {/* Contenedor de texto  */}
+          <div className="text-center max-w-xs md:max-w-sm">
+            <p className="text-white text-sm sm:text-base leading-relaxed">
               Con{" "}
-              <span className="font-semibold text-secundary-color">
+              <span className="font-semibold text-secundary-color hover:text-secundary-color/80 transition-colors">
                 FocusFrame
               </span>
-              administra tu calendario, citas y archivos de tu paciente desde una interfaz unificada.
+              , administra tu calendario, citas y archivos de pacientes desde
+              una interfaz unificada.
             </p>
           </div>
         </div>

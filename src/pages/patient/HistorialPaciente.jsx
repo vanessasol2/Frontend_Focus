@@ -1,7 +1,7 @@
 import React from "react";
 import FilterHisto from "../../components/historial/FilterHisto";
 import Accordion from "../../components/historial/Accordion";
-import MainLayout from "../../layout/MainLayout";
+import MainLayout from "../../layout/paciente/MainLayout";
 import { 
   User, 
   Calendar, 

@@ -6,7 +6,7 @@ import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import { es } from "date-fns/locale";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
+import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import ModalCitaPsicologo from "../../components/citaPsicologo/ModalCitaPsicologo";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../../components/citaPsicologo/CalendarioSelector.css";

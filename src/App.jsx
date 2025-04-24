@@ -1,9 +1,16 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "./redux/slices/authSlice";
+import { jwtDecode } from "jwt-decode";
+
+//Sistema
 import { LoginFormPaciente } from "./auth/paciente/LoginFormPaciente";
 import { RegisterFormPaciente } from "./auth/paciente/RegisterFormPaciente";
 import { RegisterFormPsicologo } from "./auth/psicologo/RegisterFormPsicologo";
 import {OlvideContrasena}  from "./auth/paciente/OlvideContrasena";
 import RestablecerContrasena from "./auth/paciente/RestablecerContrasena";
+
 //Paciente
 import HomePaciente from "./pages/patient/HomePaciente";
 import CitasPaciente from "./pages/patient/CitasPaciente";
@@ -22,6 +29,33 @@ import CrearPaciente from "./components/crearPaciente/CrearPaciente";
 import CrearHistorialClinico from "./components/crearHistorialClinico/CrearHistorialClinico"
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        if (decoded.exp && decoded.exp * 1000 < Date.now()) {
+          throw new Error("Token expirado");
+        }
+
+        dispatch(login({ 
+          token,
+          user: { 
+            email: decoded.sub || decoded.email,
+            name: decoded.name || (decoded.sub ? decoded.sub.split('@')[0] : 'Usuario') 
+          },
+          role: decoded.roles?.[0] || decoded.role,
+        }));
+      } catch (error) {
+        console.error("Error inicializando autenticación:", error);
+        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
+      }
+    }
+  }, [dispatch]);
+
   return (
     <Routes>
       {/* Ruta de la Landing Page */}

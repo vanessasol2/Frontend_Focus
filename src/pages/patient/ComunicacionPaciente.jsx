@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import MainLayout from "../../layout/MainLayout";
+import MainLayout from "../../layout/paciente/MainLayout";
 import ContactoList from "../../components/comunicacionPaciente/ContactoList";
 import ChatBox from "../../components/comunicacionPaciente/ChatBox";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import MainLayout from "../../layout/MainLayout";
+import MainLayout from "../../layout/paciente/MainLayout";
 import Resumen from "../../components/homePaciente/Resumen";
 import "../../components/homePaciente/Resumen.css";
 import RecentAppointments from "../../components/homePaciente/RecentAppointments";

@@ -33,28 +33,40 @@ export function LoginFormPaciente() {
 
   const onSubmit = async (data) => {
     setLoading(true);
-
+  
     try {
       const response = await axios.post("http://localhost:8081/auth/login", {
         email: data.email,
         password: data.password,
+      }, {
+        withCredentials: true
       });
-
+  
       if (response.data?.token) {
         const token = response.data.token;
-
-        data.rememberMe
-          ? localStorage.setItem("token", token)
-          : sessionStorage.setItem("token", token);
-
         const decoded = jwtDecode(token);
-        const roles = Array.isArray(decoded.roles)
-          ? decoded.roles
-          : [decoded.roles];
-        const user = { email: data.email };
-
-        dispatch(login({ user, role: roles, token }));
-
+        console.log("Token decodificado:", decoded);
+  
+        if (data.rememberMe) {
+          localStorage.setItem("token", token);
+        } else {
+          sessionStorage.setItem("token", token);
+        }
+  
+        const roles = Array.isArray(decoded.roles) ? decoded.roles : [decoded.roles];
+        
+        const user = { 
+          email: decoded.sub || data.email, 
+          name: decoded.name || data.email.split('@')[0] 
+        };
+  
+        dispatch(login({ 
+          user, 
+          role: roles.includes("PACIENTE") ? "PACIENTE" : "PSICOLOGO", 
+          token 
+        }));
+  
+        // Redirección basada en rol
         if (roles.includes("PACIENTE")) {
           navigate("/home-paciente");
         } else if (roles.includes("PSICOLOGO")) {
@@ -66,12 +78,13 @@ export function LoginFormPaciente() {
         setError("root", { message: "Usuario o contraseña incorrectos." });
       }
     } catch (error) {
+
       if (error.response) {
-        if (error.response.status === 401) {
-          setError("root", { message: "Usuario o contraseña incorrectos" });
-        } else if (error.response.status === 500) {
-          setError("root", { message: "Error interno del servidor" });
-        }
+        const status = error.response.status;
+        const message = status === 401 ? "Usuario o contraseña incorrectos" :
+                       status === 500 ? "Error interno del servidor" :
+                       `Error del servidor (${status})`;
+        setError("root", { message });
       } else {
         setError("root", { message: "No se pudo conectar con el servidor" });
       }

@@ -1,5 +1,5 @@
 import React from "react";
-import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo"; 
+import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo"; 
 import MisPacientes from "../../components/paciente/MisPacientes"; 
 
 const Pacientes = () => {

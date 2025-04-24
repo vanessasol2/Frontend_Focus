@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
+import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import FiltroCrear from "./FiltroCrear";
 import { Toaster, toast } from "sonner";
 import { ChevronDown } from "lucide-react";

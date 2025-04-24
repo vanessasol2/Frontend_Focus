@@ -5,7 +5,7 @@ import {
   ClockAlert,
   BanIcon,
 } from "lucide-react";
-import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
+import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import ResumenCard from "../../components/homePsicologo/ResumenCard";
 import CalendarioSection from "../../components/homePsicologo/CalendarioCita";
 import ListaPacientes from "../../components/homePsicologo/ListaPacientes";

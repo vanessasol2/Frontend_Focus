@@ -1,5 +1,5 @@
 import { useState } from "react";
-import MainLayout from "../../layout/MainLayout";
+import MainLayout from "../../layout/paciente/MainLayout";
 import Pendientes from "../../components/pago/Pendientes";
 import Movimientos from "../../components/pago/Movimientos";
 

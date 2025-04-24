@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { User, Pill, Search } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import MainLayoutPsicologo from "../../layout/MainLayoutPsicologo";
+import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import FiltroCrear from "../../components/crearPaciente/FiltroCrear";
 
 const CrearHistorialClinico = () => {

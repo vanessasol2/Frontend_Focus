@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { logout } from "../redux/slices/AuthSlice";
+import { logout } from "../../redux/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HomeIcon, BriefcaseMedical, CircleDollarSign, MessageSquareText, ScanHeart, LogOut, ChevronLast, ChevronFirst } from "lucide-react";
-import "../layout/style/Sidebar.css";
+import "../style/Sidebar.css";
 
 const Sidebar = () => {
   const location = useLocation();

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { logout } from "../redux/slices/AuthSlice";
+import { logout } from "../../redux/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HomeIcon, BriefcaseMedical, MessageSquareText, ScanHeart, LogOut, ChevronLast, ChevronFirst, Users } from "lucide-react";
-import "../layout/style/Sidebar.css";
+import "../style/Sidebar.css";
 
 const Sidebar = () => {
   const location = useLocation();
@@ -25,18 +25,15 @@ const Sidebar = () => {
     localStorage.setItem("sidebarExpanded", JSON.stringify(expanded));
   }, [expanded]);
 
-  // Función mejorada para manejar rutas anidadas y exactas
   const isActive = (path, exact = false) => {
     if (exact) {
       return location.pathname === path;
     }
     
-    // Mapeo especial para rutas que deben activar otros items
     const routeMappings = {
       '/crear-paciente': '/pacientes',
       '/editar-paciente': '/pacientes',
       '/historial-paciente': '/historial',
-      // Agrega más mapeos según sea necesario
     };
     
     const mappedPath = routeMappings[location.pathname] || path;

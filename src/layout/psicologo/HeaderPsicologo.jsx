@@ -1,19 +1,19 @@
 import { useLocation, Link } from "react-router-dom";
-import Notificaciones from "../components/header/Notifications";
-import "../layout/style/Header.css";
+import { useSelector } from "react-redux";
+import Notificaciones from "../../components/header/Notifications";
+import "../style/Header.css";
 
 const HeaderPsicologo = () => {
   const location = useLocation();
+  const { user } = useSelector((state) => state.auth);
+  const userName = user?.name || "Invitado";
 
-  
   const routeNames = {
-    "/home-psicologo": "Inicio",
+    "/home-psicologo": `Bienvenido, ${userName}`,
     "/citas-psicologo": "Citas",
     "/pacientes": "Mis Pacientes",
     "/crear-paciente": "Nuevo Paciente",
     "/historial-clinico": "Historiales Médicos",
-    "/consultas": "Consultas Virtuales",
-    "/reportes": "Reportes",
     "/configuracion": "Configuración"
   };
 
@@ -78,7 +78,9 @@ const HeaderPsicologo = () => {
             </ul>
           </nav>
         </div>
+        <div className="user-info">
         <Notificaciones />
+        </div>
       </div>
     </header>
   );

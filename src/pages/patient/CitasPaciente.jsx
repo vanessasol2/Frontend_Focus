@@ -1,13 +1,20 @@
 import { useState } from "react";
 import { CalendarDays } from "lucide-react";
-import MainLayout from "../../layout/MainLayout";
+import MainLayout from "../../layout/paciente/MainLayout";
 import Filter from "../../components/citaPaciente/Filter";
-import AppointmentModal from "../../components/citaPaciente/CitaModal";
+import ModalCitaPsicologo from "../../components/citaPaciente/ModalCitaPsicologo";
 import AppointmentCard from "../../components/citaPaciente/CitaCard";
 
-
 const CitasPaciente = () => {
-  const [open, setOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    titulo: '',
+    fecha: '',
+    hora: '',
+    notas: ''
+  });
+  const [error, setError] = useState('');
+  
   const [appointments, setAppointments] = useState([
     {
       id: 1,
@@ -32,13 +39,44 @@ const CitasPaciente = () => {
     },
   ]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    // Validaciones básicas
+    if (!formData.titulo || !formData.fecha || !formData.hora) {
+      setError('Todos los campos obligatorios deben ser completados');
+      return;
+    }
+    
+    // Crear nueva cita
+    const newAppointment = {
+      id: appointments.length + 1,
+      name: formData.titulo,
+      date: new Date(formData.fecha).toLocaleDateString('es-ES', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }),
+      time: formData.hora,
+      status: "Confirmed"
+    };
+    
+    setAppointments([...appointments, newAppointment]);
+    setIsModalOpen(false);
+    setFormData({ titulo: '', fecha: '', hora: '', notas: '' });
+    setError('');
+  };
+
   return (
     <MainLayout>
       <div className="p-4 mt-8">
         <div className="flex justify-end mb-2">
           <button
-            className="bg-primary-color text-white py-2 px-6 rounded-lg  hover:bg-secundary-color transition-all duration-300 flex items-center gap-2"
-            onClick={() => setOpen(true)}
+            className="bg-primary-color text-white py-2 px-6 rounded-lg hover:bg-secundary-color transition-all duration-300 flex items-center gap-2"
+            onClick={() => setIsModalOpen(true)}
           >
             <CalendarDays className="w-5 h-5" /> Agendar una cita
           </button>
@@ -51,7 +89,14 @@ const CitasPaciente = () => {
         </div>
       </div>
 
-      <AppointmentModal open={open} setOpen={setOpen} setAppointments={setAppointments} />
+      <ModalCitaPsicologo
+        open={isModalOpen}
+        setOpen={setIsModalOpen}
+        formulario={formData}
+        manejarCambio={handleChange}
+        agregarEvento={handleSubmit}
+        error={error}
+      />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 py-6">
         {appointments.map((appointment) => (

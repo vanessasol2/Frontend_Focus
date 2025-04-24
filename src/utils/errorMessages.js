@@ -1,6 +1,6 @@
 export const errorMessages = {
   // Mensajes del backend
-  'email.not.found': 'Correo electrónico ya registrado',
+  'email.not.found': 'Correo electrónico no encontrado',
   'email.use': 'El correo ya se encuentra registrado',
   'doc.register': 'Este número de documento ya está registrado',
   'user.not.found': 'Usuario no encontrado',

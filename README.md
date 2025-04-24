@@ -1,6 +1,8 @@
 # FocusFrame - Plataforma de Gestión Psicológica
 
-![FocusFrame]
+<div align="center">
+  <img src="./src/img/logo.png" alt="FocusFrame Logo" width="200"/>
+</div>
 
 Plataforma integral para la gestión de citas, pacientes y historiales clínicos entre psicólogos y pacientes.
 
@@ -19,13 +21,12 @@ Plataforma integral para la gestión de citas, pacientes y historiales clínicos
 ## Tecnologías Utilizadas
 
 - **Frontend**: 
-  ![React](https://img.shields.io/badge/React-18.2-blue)
-  ![Vite](https://img.shields.io/badge/Vite-4.0-orange)
-  ![Redux](https://img.shields.io/badge/Redux-4.2-purple)
+  ![React](https://img.shields.io/badge/React-18.2-%2361DAFB)
+  ![Vite](https://img.shields.io/badge/Vite-4.0-%23BD34FE)
+  ![Redux](https://img.shields.io/badge/Redux-4.2-%23764ABC)
+  ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3-%2306B6D4)
   
 - **Estilos**: 
-  ![CSS Modules](https://img.shields.io/badge/CSS_Modules-1.0-blue)
-  ![PostCSS](https://img.shields.io/badge/PostCSS-8.0-blueviolet)
-
-
+  ![CSS Modules](https://img.shields.io/badge/CSS_Modules-1.0-%231572B6)
+  ![PostCSS](https://img.shields.io/badge/PostCSS-8.0-%23DD3A0A)
 

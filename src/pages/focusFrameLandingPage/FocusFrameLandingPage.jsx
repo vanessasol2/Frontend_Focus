@@ -106,13 +106,17 @@ export default function FocusFrameLandingPage() {
               console.log("Navegando a /register-psicologo");
               navigate("/register-psicologo");
             }}
-            className="rounded-md border border-primary-color py-2 px-4 text-center text-sm transition-all shadow-sm hover:shadow-lg text-primary-color hover:text-white hover:bg-primary-color hover:border-slate-800 focus:text-white focus:bg-slate-800 focus:border-slate-800 active:border-slate-800 active:text-white active:bg-slate-800 disabled:pointer-events-none disabled:opacity-50"
+            className="rounded-md border border-primary-color py-2 px-4 text-center text-sm transition-all 
+            shadow-sm hover:shadow-lg text-primary-color hover:text-white hover:bg-primary-color hover:border-violet-800 
+            focus:text-white focus:bg-violet-800 focus:border-violet-800 active:border-violet-800 active:text-white active:bg-violet-800 
+            disabled:pointer-events-none disabled:opacity-50"
           >
             Registrate
           </button>
           <button
             onClick={() => navigate("/login")}
-            className="py-2 px-4 text-center text-sm transition-all shadow-sm bg-primary-color text-white rounded-lg hover:bg-secundary-color transition-all duration-300"
+            className="py-2 px-4 text-center text-sm transition-all shadow-sm bg-primary-color 
+            text-white rounded-lg hover:bg-secundary-color transition-all duration-300"
           >
             Iniciar sesión
           </button>
@@ -133,14 +137,15 @@ export default function FocusFrameLandingPage() {
 
         <div className="relative mt-10">
           <div className="absolute inset-0 flex justify-center items-center">
-            <button className="flex items-center gap-2 button-primary text-white px-6 py-2 rounded-full shadow-md hover:bg-[#6f35e0] transition-all duration-300 focus:ring-2 focus:ring-primary-color focus:ring-opacity-50">
+            <button className="flex items-center gap-2 button-primary text-white px-6 py-2 rounded-full 
+            shadow-md hover:bg-primary-color transition-all duration-300 focus:ring-2 focus:ring-primary-color focus:ring-opacity-50">
               <Play size={18} /> Ver Video
             </button>
           </div>
         </div>
 
         <div className="relative flex justify-center items-center mt-10 py-9">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#c084fc]/10 to-[#5603AD]/10 rounded-xl blur-xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-[#c084fc]/10 to-primary-color/10 rounded-xl blur-xl"></div>
 
           <div className="relative w-full max-w-4xl p-2">
             <img
@@ -171,7 +176,7 @@ export default function FocusFrameLandingPage() {
               onClick={() => handleToggle(index)}
               className={`p-6 rounded-lg shadow-lg cursor-pointer transition-all duration-300  ${
                 activeIndex === index
-                  ? "bg-gradient-to-r from-[#c084fc] to-[#a855f7] text-white"
+                  ? "bg-gradient-to-r from-[#c084fc] to-primary-color text-white"
                   : "bg-[#f3f0ff] text-[#404040]"
               }`}
             >
@@ -222,7 +227,7 @@ export default function FocusFrameLandingPage() {
                 },
               ].map((item, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <CheckCircle size={24} className="text-[#5603AD]" />
+                  <CheckCircle size={24} className="text-primary-color" />
                   <div>
                     <h4 className="font-bold text-lg">{item.title}</h4>
                     <p className="text-sm text-gray-200">{item.description}</p>
@@ -256,7 +261,7 @@ export default function FocusFrameLandingPage() {
       <section id="servicios" className="py-16 bg-[#faf7ff] text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Algunas <span className="text-[#7e22ce]">preguntas frecuentes</span>{" "}
+            Algunas <span className="text-primary-color">preguntas frecuentes</span>{" "}
             sobre nuestro Software
           </h2>
 
@@ -415,7 +420,7 @@ export default function FocusFrameLandingPage() {
               </li>
               <li className="flex items-center gap-2 text-white/70">
                 <MapPin size={16} className="text-white" />
-                <span>Buenos Aires, Argentina</span>
+                <span>Bogota</span>
               </li>
             </ul>
           </div>

@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 
-
 const ModalCitaPsicologo = ({
   formulario,
   manejarCambio,

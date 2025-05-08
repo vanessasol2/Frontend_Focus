@@ -13,7 +13,6 @@ export function LoginFormPaciente() {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     setError,
   } = useForm({
     defaultValues: {
@@ -49,8 +48,10 @@ export function LoginFormPaciente() {
   
         if (data.rememberMe) {
           localStorage.setItem("token", token);
+          localStorage.setItem("email", decoded.sub || data.email);
         } else {
           sessionStorage.setItem("token", token);
+          localStorage.setItem("email", decoded.sub || data.email);
         }
   
         const roles = Array.isArray(decoded.roles) ? decoded.roles : [decoded.roles];
@@ -124,7 +125,7 @@ export function LoginFormPaciente() {
           ${
             errors.email
               ? "border-red-500"
-              : "border-gray-300 focus:ring-2 focus:ring-primary-color"
+              : "border-gray-300 focus:ring-1 focus:ring-primary-color"
           }
         `}
                   {...register("email", {
@@ -161,7 +162,7 @@ export function LoginFormPaciente() {
           ${
             errors.password
               ? "border-red-500"
-              : "border-gray-300 focus:ring-2 focus:ring-primary-color"
+              : "border-gray-300 focus:ring-1 focus:ring-primary-color"
           }
         `}
                   {...register("password", {

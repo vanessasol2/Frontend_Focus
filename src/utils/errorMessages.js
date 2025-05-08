@@ -1,55 +1,127 @@
 export const errorMessages = {
-  // Mensajes del backend
+  // Autenticación
   'email.not.found': 'Correo electrónico no encontrado',
-  'email.use': 'El correo ya se encuentra registrado',
-  'doc.register': 'Este número de documento ya está registrado',
-  'user.not.found': 'Usuario no encontrado',
-  'password.changed.success': 'Contraseña cambiada con éxito',
+  'email.use': 'El correo electrónico ya está registrado',
+  'email.invalid': 'El correo electrónico no es válido',
+  'email.too.short': 'Ingrese un correo electrónico válido',
   
-  // Mensajes de validación del frontend
-  'validation.required': 'Este campo es obligatorio',
-  'validation.email': 'Correo electrónico no válido',
-  'validation.phone': 'Teléfono no válido (10-15 dígitos)',
-  'validation.cc': 'Cédula no válida (6-12 dígitos)',
-  'validation.ce': 'Cédula de extranjería no válida',
-  'validation.minLength': 'Debe tener al menos {min} caracteres',
-  'validation.maxLength': 'No puede exceder los {max} caracteres',
-  'validation.username': 'Solo letras, números y guiones bajos',
-  'validation.licencia': 'Solo letras, números y guiones',
-  'validation.password': 'Mínimo 6 caracteres',
+  // Usuarios
+  'user.not.found': 'Usuario no encontrado',
+  'user.register.success': 'Usuario registrado exitosamente',
+  'username.found': 'El nombre de usuario ya está en uso',
+  
+  // Documentos
+  'doc.register': 'Este número de documento ya está registrado',
+  'doc.length.invalid': 'El documento no debe tener más de 11 dígitos',
+  'document.length.invalid': 'El documento debe tener al menos 8 dígitos',
+  
+  // Contraseñas
+  'password.changed.success': 'Contraseña cambiada con éxito',
+  'password.too.short': 'La contraseña debe tener al menos 12 caracteres',
+  
+  // Funcionarios
+  'funcionario.register': 'Funcionario ya registrado',
+  'funcionario.not.found': 'Funcionario no encontrado',
+  
+  // Pacientes
+  'patient.not.found': 'Paciente no encontrado',
+  'medical.history.found': 'El paciente ya tiene historial clínico',
+  'medical.history.not.found': 'Historial clínico no encontrado',
+  
+  // Validaciones
+  'nombre.apellido.required': 'Nombre y apellido son obligatorios',
+  'hobby.other.required': 'Debe especificar el hobbie cuando selecciona OTRO',
+  'medicine.other.required': 'Debe especificar el medicamento cuando selecciona OTRO',
+  'disease.other.required': 'Debe especificar la enfermedad cuando selecciona OTRO',
+  'phone.length.invalid': 'El teléfono debe tener 10 dígitos',
+  
+  // Terapias
+  'therapy.not.found': 'Terapia no encontrada',
+  'session.time.conflict': 'Horario no disponible para la cita',
+  
+  // Tokens
+  'token.invalid': 'Enlace de verificación no válido',
+  'token.expired': 'Enlace de verificación expirado',
+  
+  // Mensajes positivos
+  'password.reset.email.subject': 'Recuperar contraseña',
+  'password.reset.email.text': 'Para recuperar tu contraseña haz clic en el siguiente enlace: {0}',
+  
+  // Errores genéricos
+  'validation.error': 'Error de validación',
+  'server.error': 'Error interno del servidor',
+  'network.error': 'Problema de conexión. Verifique su internet',
+
+  // Validaciones estructuradas
+  validation: {
+    required: 'Este campo es obligatorio',
+    minLength: 'Debe tener al menos {min} caracteres',
+    maxLength: 'No puede exceder los {max} caracteres',
+    email: 'Ingrese un correo electrónico válido',
+    numeric: 'Solo se permiten números',
+    username: 'Solo letras, números y guiones bajos',
+    licencia: 'Solo letras, números y guiones',
+    password: 'Mínimo 6 caracteres',
+    invalidDate: 'Fecha no válida',
+    minAge: 'Debes tener al menos {min} años',
+    futureDate: 'La fecha no puede ser futura'
+  }
 };
 
-export const getBackendMessage = (error) => {
-  if (!error.response) {
-    return errorMessages['validation.connection'] || 'Error de conexión con el servidor';
+export const getBackendMessage = (error, params = [], debug = false) => {
+  // string directo 
+  if (typeof error === 'string') {
+    return formatMessage(error, params);
   }
-
-  const { data, status } = error.response;
-
   
-  if (data.message) {
+  // error de Axios
+  if (error.isAxiosError) {
+    // Error de red (sin conexión)
+    if (!error.response) {
+      return errorMessages['network.error'];
+    }
     
-    const knownKey = Object.keys(errorMessages).find(key => 
-      data.message.toLowerCase().includes(key.replace(/\./g, ' ').toLowerCase())
-    );
-    return knownKey ? errorMessages[knownKey] : data.message;
+    const { data, status } = error.response;
+    
+    // backend
+    if (data?.errorCode && errorMessages[data.errorCode]) {
+      return formatMessage(errorMessages[data.errorCode], params);
+    }
+    
+    // mensaje del backend
+    if (data?.message) {
+      const backendCode = Object.keys(errorMessages).find(
+        key => data.message.includes(key.replace(/\./g, ' '))
+      );
+      if (backendCode) {
+        return formatMessage(errorMessages[backendCode], params);
+      }
+      
+      // desarrollo
+      if (debug) return data.message;
+    }
+    
+    // estado HTTP
+    switch(status) {
+      case 400: return errorMessages['validation.error'];
+      case 401: return 'No autorizado';
+      case 403: return 'Acceso denegado';
+      case 404: return 'Recurso no encontrado';
+      case 409: return errorMessages['doc.register'] || 'Conflicto de datos';
+      case 422: return errorMessages['validation.error'];
+      default: return errorMessages['server.error'];
+    }
   }
-
   
-  if (data.errorCode) {
-    return errorMessages[data.errorCode] || data.errorCode;
-  }
+  // otros tipos de error
+  return debug ? error.message : errorMessages['server.error'];
+};
 
+const formatMessage = (errorCode, params = []) => {
+  const messageTemplate = errorMessages[errorCode] || errorCode;
   
-  switch (status) {
-    case 400: 
-      return data.error || errorMessages['doc.register'] || 'Solicitud incorrecta';
-    case 401: return 'No autorizado - Por favor inicia sesión';
-    case 403: return errorMessages['email.use'] || 'Acceso denegado';
-    case 404: return 'Recurso no encontrado';
-    case 409: return errorMessages['doc.register'] || 'Conflicto - El recurso ya existe';
-    case 422: return 'Datos de entrada no válidos';
-    case 500: return 'Error interno del servidor';
-    default: return `Error desconocido (código ${status})`;
-  }
+  return params.reduce((msg, param, index) => 
+    msg.replace(new RegExp(`\\{${index}\\}`, 'g'), param), 
+    messageTemplate
+  );
 };

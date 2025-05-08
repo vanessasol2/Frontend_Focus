@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { logout } from "../../redux/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { HomeIcon, BriefcaseMedical, MessageSquareText, ScanHeart, LogOut, ChevronLast, ChevronFirst, Users } from "lucide-react";
+import { HomeIcon, BriefcaseMedical, MessageSquareText, ScanHeart, LogOut, ChevronLast, ChevronFirst, Users, User } from "lucide-react";
 import "../style/Sidebar.css";
 
 const Sidebar = () => {
@@ -34,12 +34,17 @@ const Sidebar = () => {
       '/crear-paciente': '/pacientes',
       '/editar-paciente': '/pacientes',
       '/historial-paciente': '/historial',
+      '/perfil-psicologo': '/perfil',
+      '/home-psicologo': '/home-psicologo',
+      '/citas-psicologo': '/citas-psicologo',
+      '/comunicacion-psicologo': '/comunicacion'
     };
     
-    const mappedPath = routeMappings[location.pathname] || path;
+    const currentPath = routeMappings[location.pathname] || location.pathname;
+    const targetPath = routeMappings[path] || path;
     
-    return location.pathname === mappedPath || 
-           location.pathname.startsWith(`${mappedPath}/`);
+    return currentPath === targetPath || 
+           currentPath.startsWith(`${targetPath}/`);
   };
 
   return (
@@ -77,21 +82,21 @@ const Sidebar = () => {
           to="/historial" 
           text="Historial Clínico" 
           icon={<ScanHeart />} 
-          active={isActive("/historial")} 
+          active={isActive("/historial-psicologo")} 
           expanded={expanded} 
         />
         <SidebarLink 
           to="/comunicacion" 
           text="Comunicación" 
           icon={<MessageSquareText />} 
-          active={isActive("/comunicacion", true)} 
+          active={isActive("/comunicacion-psicolgo", true)} 
           expanded={expanded} 
         />
         <SidebarLink 
-          to="/perfil" 
+          to="/perfil-psicologo" 
           text="Perfil" 
-          icon={<MessageSquareText />} 
-          active={isActive("/perfil", true)} 
+          icon={<User />} 
+          active={isActive("/perfil-psicologo", true)} 
           expanded={expanded} 
         />  
       </nav>

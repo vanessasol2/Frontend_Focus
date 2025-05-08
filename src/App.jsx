@@ -26,7 +26,8 @@ import HomePsicologo from "./pages/psicologo/HomePsicologo";
 import Pacientes from "./pages/psicologo/Pacientes";
 import CitasPsicologo from "./pages/psicologo/CitasPsicologo";
 import CrearPaciente from "./components/crearPaciente/CrearPaciente";
-import CrearHistorialClinico from "./components/crearHistorialClinico/CrearHistorialClinico"
+import CrearHistorialClinico from "./components/crearHistorialClinico/CrearHistorialClinico";
+import PerfilPsicologo from "./pages/psicologo/PerfilPsicologo"
 
 function App() {
   const dispatch = useDispatch();
@@ -154,6 +155,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
             <CrearHistorialClinico />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/perfil-psicologo"
+        element={
+          <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
+            <PerfilPsicologo />
           </ProtectedRoute>
         }
       />

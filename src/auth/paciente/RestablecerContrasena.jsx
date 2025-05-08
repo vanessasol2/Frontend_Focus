@@ -248,7 +248,7 @@ const RestablecerContrasena = () => {
                 !isValid || cargando
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-primary-color hover:bg-secundary-color"
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-color transition-colors duration-200`}
+              } focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-primary-color transition-colors duration-200`}
             >
               {cargando ? (
                 <>

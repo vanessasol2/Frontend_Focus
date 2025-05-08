@@ -9,15 +9,19 @@ const Header = () => {
   const userName = user?.name || "Paciente";
 
   const routeNames = {
-    "/home-paciente": `Hola, ${userName}`, 
+    "/home-paciente": `Bienvenido, ${userName}`,
     "/citas": "Mis Citas",
     "/pagos": "Pagos",
     "/historial": "Historial Clínico",
     "/comunicacion": "Comunicación",
   };
 
+  const getRouteName = (path) => {
+    return routeNames[path] || path.split("/").pop().replace(/-/g, " ");
+  };
+
   const getPageTitle = () => {
-    return routeNames[location.pathname] || "Inicio";
+    return getRouteName(location.pathname);
   };
 
   const generateBreadcrumb = () => {
@@ -25,55 +29,54 @@ const Header = () => {
     if (paths.length === 0) return null;
 
     let currentPath = "";
-    return paths.map((path, index) => {
+    let breadcrumbItems = [];
+
+    breadcrumbItems.push(
+      <li key="home">
+        <Link to="/home-paciente" className="breadcrumb-link">
+          Inicio
+        </Link>
+      </li>
+    );
+
+    paths.forEach((path, index) => {
       currentPath += `/${path}`;
       const isLast = index === paths.length - 1;
-      const routeName = routeNames[currentPath] || path;
+      const routeName = getRouteName(currentPath);
 
-      return (
-        <li key={currentPath} className="breadcrumb-item">
+      breadcrumbItems.push(
+        <li key={currentPath}>
           {!isLast ? (
-            <>
-              <span className="breadcrumb-separator">/</span>
-              <Link to={currentPath} className="breadcrumb-link" aria-current={isLast ? "page" : undefined}>
-                {routeName}
-              </Link>
-            </>
+            <Link to={currentPath} className="breadcrumb-link">
+              {routeName}
+            </Link>
           ) : (
-            <>
-              <span className="breadcrumb-separator">/</span>
-              <span className="breadcrumb-active" aria-current="page">
-                {routeName}
-              </span>
-            </>
+            <span className="breadcrumb-active" aria-current="page">
+              {routeName}
+            </span>
           )}
         </li>
       );
     });
+
+    return breadcrumbItems;
   };
 
   return (
     <header className="header" role="banner">
       <div className="breadcrumb-download">
         <div>
-          <h1 className={`breadcrumb-title ${location.pathname === "/home-paciente" ? "welcome-title" : ""}`}>
-            {getPageTitle()}
-          </h1>
+          <h1 className="breadcrumb-title">{getPageTitle()}</h1>
           <nav aria-label="Ruta de navegación">
-            <ul className="breadcrumb-list">
-              <li key="home">
-                <Link to="/home-paciente" className="breadcrumb-link">
-                  Inicio
-                </Link>
-              </li>
+            <ul
+              className="breadcrumb-list"
+              style={{ display: "flex", gap: "8px" }}
+            >
               {generateBreadcrumb()}
             </ul>
           </nav>
         </div>
         <div className="user-info">
-          {location.pathname !== "/home-paciente" && (
-            <span className="user-name">{userName}</span>
-          )}
           <Notificaciones />
         </div>
       </div>

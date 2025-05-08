@@ -13,13 +13,12 @@ const HeaderPsicologo = () => {
     "/citas-psicologo": "Citas",
     "/pacientes": "Mis Pacientes",
     "/crear-paciente": "Nuevo Paciente",
+    "/perfil-psicologo": "Perfil ",
     "/historial-clinico": "Historiales Médicos",
-    "/configuracion": "Configuración"
   };
 
-
   const getRouteName = (path) => {
-    return routeNames[path] || path.split('/').pop().replace(/-/g, ' ');
+    return routeNames[path] || path.split("/").pop().replace(/-/g, " ");
   };
 
   const getPageTitle = () => {
@@ -33,7 +32,6 @@ const HeaderPsicologo = () => {
     let currentPath = "";
     let breadcrumbItems = [];
 
-    
     breadcrumbItems.push(
       <li key="home">
         <Link to="/home-psicologo" className="breadcrumb-link">
@@ -42,7 +40,6 @@ const HeaderPsicologo = () => {
       </li>
     );
 
-    
     paths.forEach((path, index) => {
       currentPath += `/${path}`;
       const isLast = index === paths.length - 1;
@@ -50,7 +47,6 @@ const HeaderPsicologo = () => {
 
       breadcrumbItems.push(
         <li key={currentPath}>
-          <span className="breadcrumb-separator">/</span>
           {!isLast ? (
             <Link to={currentPath} className="breadcrumb-link">
               {routeName}
@@ -73,13 +69,16 @@ const HeaderPsicologo = () => {
         <div>
           <h1 className="breadcrumb-title">{getPageTitle()}</h1>
           <nav aria-label="Ruta de navegación">
-            <ul className="breadcrumb-list">
+            <ul
+              className="breadcrumb-list"
+              style={{ display: "flex", gap: "8px" }}
+            >
               {generateBreadcrumb()}
             </ul>
           </nav>
         </div>
         <div className="user-info">
-        <Notificaciones />
+          <Notificaciones />
         </div>
       </div>
     </header>

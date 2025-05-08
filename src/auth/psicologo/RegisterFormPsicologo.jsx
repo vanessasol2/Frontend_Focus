@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import {User,Mail,Lock,Eye,EyeOff,FileUser,BriefcaseBusiness,BookUser,} from "lucide-react";
+import {User,Mail,Lock,Eye,EyeOff,FileUser,BriefcaseBusiness,BookUser,File,FileText,} from "lucide-react";
 import agendar from "../../img/agendar.webp";
-import { errorMessages, getBackendMessage } from "../../utils/errorMessages";
-import { toast, Toaster } from 'sonner';
+import { errorMessages,getBackendMessage } from "../../utils/errorMessages";
+import { toast, Toaster } from "sonner";
 
 const tiposDocumento = [
   { value: "CC", label: "Cédula de Ciudadanía" },
@@ -17,52 +17,75 @@ const tiposDocumento = [
 
 const validationRules = {
   nombre: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     minLength: {
       value: 2,
-      message: errorMessages["validation.minLength"].replace("{min}", "2"),
+      message: errorMessages.validation.minLength.replace("{min}", "2"),
     },
     maxLength: {
       value: 50,
-      message: errorMessages["validation.maxLength"].replace("{max}", "50"),
+      message: errorMessages.validation.maxLength.replace("{max}", "50"),
     },
+    pattern: {
+      value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+      message: errorMessages.validation.onlyLetters || "Solo se permiten letras y espacios"
+    }
   },
   apellido: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     minLength: {
       value: 2,
-      message: errorMessages["validation.minLength"].replace("{min}", "2"),
+      message: errorMessages.validation.minLength.replace("{min}", "2"),
     },
     maxLength: {
       value: 50,
-      message: errorMessages["validation.maxLength"].replace("{max}", "50"),
+      message: errorMessages.validation.maxLength.replace("{max}", "50"),
     },
+    pattern: {
+      value: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/,
+      message: errorMessages.validation.onlyLetters || "Solo se permiten letras y espacios"
+    }
   },
   username: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     minLength: {
       value: 4,
-      message: errorMessages["validation.minLength"].replace("{min}", "4"),
+      message: errorMessages.validation.minLength.replace("{min}", "4"),
     },
     maxLength: {
       value: 20,
-      message: errorMessages["validation.maxLength"].replace("{max}", "20"),
+      message: errorMessages.validation.maxLength.replace("{max}", "20"),
     },
     pattern: {
       value: /^[a-zA-Z0-9_]+$/,
-      message: errorMessages["validation.username"],
+      message: errorMessages.validation.username,
     },
   },
   tipoDocumento: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
+  },
+  documento: {
+    required: errorMessages.validation.required,
+    pattern: {
+      value: /^[0-9]+$/,
+      message: errorMessages.validation.numeric,
+    },
+    validate: {
+      maxLength: (value) => 
+        value.length <= 10 || errorMessages.validation.maxLength.replace("{max}", "10"),
+      validNumber: (value) => {
+        const num = Number(value);
+        return num <= 2147483647 || errorMessages.validation.numberTooLarge || "Número demasiado grande";
+      }
+    }
   },
   fechaNacimiento: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     validate: {
       validDate: (value) => {
         if (!value) return true;
         const date = new Date(value);
-        return !isNaN(date.getTime()) || "Fecha no válida";
+        return !isNaN(date.getTime()) || errorMessages.validation.invalidDate || "Fecha no válida";
       },
       minAge: (value) => {
         if (!value) return true;
@@ -70,62 +93,67 @@ const validationRules = {
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (
-          monthDiff < 0 ||
-          (monthDiff === 0 && today.getDate() < birthDate.getDate())
-        ) {
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
           age--;
         }
-        return age >= 18 || "Debes tener al menos 18 años";
+        return age >= 18 || errorMessages.validation.minAge.replace("{min}", "18");
       },
       notFuture: (value) => {
         if (!value) return true;
-        const selectedDate = new Date(value);
-        const today = new Date();
-        return selectedDate <= today || "La fecha no puede ser futura";
+        return new Date(value) <= new Date() || errorMessages.validation.futureDate || "La fecha no puede ser futura";
       },
     },
   },
   email: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     pattern: {
       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: errorMessages["validation.email"],
+      message: errorMessages.validation.email,
     },
   },
   password: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     minLength: {
       value: 6,
-      message: errorMessages["validation.password"],
+      message: errorMessages.validation.password,
     },
     maxLength: {
       value: 30,
-      message: errorMessages["validation.maxLength"].replace("{max}", "30"),
+      message: errorMessages.validation.maxLength.replace("{max}", "30"),
     },
   },
   especialidad: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     maxLength: {
       value: 100,
-      message: errorMessages["validation.maxLength"].replace("{max}", "100"),
+      message: errorMessages.validation.maxLength.replace("{max}", "100"),
     },
   },
   experiencia: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     maxLength: {
       value: 500,
-      message: errorMessages["validation.maxLength"].replace("{max}", "500"),
+      message: errorMessages.validation.maxLength.replace("{max}", "500"),
     },
   },
   licencia: {
-    required: errorMessages["validation.required"],
+    required: errorMessages.validation.required,
     pattern: {
       value: /^[a-zA-Z0-9-]+$/,
-      message: errorMessages["validation.licencia"],
+      message: errorMessages.validation.licencia,
+    },
+    minLength: {
+      value: 6,
+      message: errorMessages.validation.minLength.replace("{min}", "6"),
+    },
+    maxLength: {
+      value: 20,
+      message: errorMessages.validation.maxLength.replace("{max}", "20"),
     },
   },
 };
+
+
 
 const InputField = ({
   id,
@@ -157,7 +185,7 @@ const InputField = ({
         id={id}
         className={`w-full p-3 ${
           Icon ? "pl-12" : "pl-4"
-        } border rounded-lg shadow-sm focus:ring-2 focus:ring-primary-color focus:outline-none transition-all ${
+        } border rounded-lg shadow-sm focus:ring-primary-color focus:outline-none transition-all ${
           errors ? "border-red-500" : "border-gray-300"
         }`}
         {...register(id, validation)}
@@ -176,7 +204,7 @@ const InputField = ({
         placeholder={placeholder}
         className={`w-full p-3 ${Icon ? "pl-12" : "pl-4"} pr-${
           showPasswordToggle ? "12" : "3"
-        } border rounded-lg shadow-sm focus:ring-2 focus:ring-primary-color focus:outline-none transition-all ${
+        } border rounded-lg shadow-sm focus:ring-1 focus:ring-primary-color focus:outline-none transition-all ${
           errors ? "border-purple-400" : "border-gray-300"
         }`}
         {...register(id, validation)}
@@ -205,6 +233,7 @@ const InputField = ({
 
 export function RegisterFormPsicologo() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -216,7 +245,7 @@ export function RegisterFormPsicologo() {
       nombre: "",
       apellido: "",
       username: "",
-      tipoDocumento: "",
+      tipoDoc: "",
       fechaNacimiento: "",
       email: "",
       password: "",
@@ -235,71 +264,149 @@ export function RegisterFormPsicologo() {
 
   const onSubmit = async (data) => {
     setMensajeError("");
+    setIsLoading(true);
   
     try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept-Language": "es" 
+        }
+      };
+  
       if (step === 1) {
-        const response = await axios.post(
+        const responsePaso1 = await axios.post(
           `http://localhost:8081/funcionario/paso1`,
           {
             nombre: data.nombre.trim(),
             apellido: data.apellido.trim(),
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          config
         );
-        setPsicologoId(response.data);
+        console.log("Respuesta completa del paso 1:", responsePaso1.data);
+        
+        if (!responsePaso1.data?.idFuncionario) {
+          throw new Error("No se recibió el ID del funcionario en la respuesta");
+        }
+    
+        const registrationData = {
+          step: 2,
+          idFuncionario: responsePaso1.data.idFuncionario,
+          datosPaso1: {
+            nombre: data.nombre.trim(),
+            apellido: data.apellido.trim()
+          }
+        };
+        localStorage.setItem('psicologoRegistration', JSON.stringify(registrationData));
+        console.log("Datos guardados en localStorage:", registrationData);
+        
+        setPsicologoId(responsePaso1.data.idFuncionario);
         setStep(2);
+  
       } else if (step === 2) {
-        const response = await axios.post(
-          `http://localhost:8081/funcionario/paso2/${psicologoId}`,
-          {
+        const savedDataStr = localStorage.getItem('psicologoRegistration');
+        if (!savedDataStr) {
+          throw new Error("No se encontraron datos de registro guardados");
+        }
+
+        const savedData = JSON.parse(savedDataStr);
+        console.log("Datos recuperados de localStorage:", savedData);
+
+        const currentId = psicologoId || savedData?.idFuncionario;
+        console.log("Current ID:", currentId);
+
+        if (!currentId) {
+          console.error("Error: No se pudo obtener el ID del funcionario");
+          console.error("Datos disponibles:", {
             psicologoId,
-            tipoDocumento: data.tipoDocumento,
-            fechaNacimiento: data.fechaNacimiento,
+            savedData
+          });
+          throw new Error("Error en el flujo de registro. Por favor comience nuevamente.");
+        }
+
+        const responsePaso2 = await axios.post(
+          `http://localhost:8081/funcionario/paso2/${currentId}`,
+          {
             username: data.username.trim(),
             email: data.email.trim(),
             password: data.password,
+            tipoDoc: data.tipoDoc,
+            fechaNacimiento: data.fechaNacimiento,
+            documento: data.documento,
           },
           {
-            headers: {
-              "Content-Type": "application/json",
-            },
+            ...config,
+            withCredentials: false 
           }
         );
+
+        console.log("Respuesta del Paso 2:", responsePaso2.data);
+  
+        
+        const updatedRegistrationData = {
+          ...savedData,
+          step: 3,
+          idUsuario: currentId,
+          datosPaso2: {
+            username: data.username.trim(),
+            email: data.email.trim(),
+            tipoDoc: data.tipoDoc,
+            documento: data.documento
+          }
+        };
+  
+        localStorage.setItem('psicologoRegistration', JSON.stringify(updatedRegistrationData));
+        console.log("Datos actualizados en localStorage:", updatedRegistrationData);
+        
+        setPsicologoId(currentId);
         setStep(3);
+  
       } else if (step === 3) {
-        const response = await axios.post(
-          `http://localhost:8081/funcionario/paso3/${psicologoId}`,
+        const savedData = JSON.parse(localStorage.getItem('psicologoRegistration'));
+        const currentId = psicologoId || savedData?.idUsuario;
+        
+        if (!currentId) {
+          throw new Error("Error en el flujo de registro. Por favor comience nuevamente.");
+        }
+  
+        const responsePaso3 = await axios.post(
+          `http://localhost:8081/funcionario/paso3/${currentId}`,
           {
-            psicologoId,
             especialidad: data.especialidad.trim(),
             experiencia: data.experiencia.trim(),
             licencia: data.licencia.trim(),
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
+          config
         );
-        toast.success('Registro completado con éxito', {
-          description: 'Ahora puedes iniciar sesión con tus credenciales',
-          duration: 5000,
-          position: 'top-center',
-        });
         
+        localStorage.removeItem('psicologoRegistration');
+      
+        toast.success("Registro completado con éxito");
         reset();
         navigate("/login");
       }
     } catch (error) {
       console.error("Error en el registro:", error);
+
+
       const errorMessage = getBackendMessage(error);
       setMensajeError(errorMessage);
+      
+      toast.error(errorMessage, {
+        duration: 7000,
+        action: error.response?.status === 409 ? {
+          label: 'Reintentar',
+          onClick: () => handleSubmit(onSubmit)()
+        } : null
+      });
+      if (error.response?.status === 404) {
+        localStorage.removeItem('psicologoRegistration');
+        setStep(1);
+      }
+    } finally {
+      setIsLoading(false);
     }
-  };
+};
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
@@ -385,15 +492,38 @@ export function RegisterFormPsicologo() {
             {step === 2 && (
               <>
                 <InputField
-                  id="tipoDocumento"
+                  id="tipoDoc"
                   label="Tipo de documento"
-                  icon={FileUser}
+                  icon={File}
                   type="select"
                   placeholder="Seleccione tu tipo de documento"
                   options={tiposDocumento}
                   register={register}
-                  errors={errors.tipoDocumento}
+                  errors={errors.tipoDoc}
                   validation={validationRules.tipoDocumento}
+                />
+                <InputField
+                  id="documento" 
+                  label="Número de documento"
+                  icon={FileText} 
+                  placeholder="Ingrese su número de documento"
+                  register={register}
+                  errors={errors.documento}
+                  validation={{
+                    required: "El número de documento es requerido",
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: "Solo se permiten números",
+                    },
+                    minLength: {
+                      value: 5,
+                      message: "Mínimo 5 caracteres",
+                    },
+                    maxLength: {
+                      value: 15,
+                      message: "Máximo 15 caracteres",
+                    },
+                  }}
                 />
                 <InputField
                   id="fechaNacimiento"

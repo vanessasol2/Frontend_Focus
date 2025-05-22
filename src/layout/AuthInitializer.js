@@ -15,14 +15,12 @@ const AuthInitializer = ({ children }) => {
           token,
           user: {
             email: decoded.sub,
-            name: decoded.name || decoded.sub.split('@')[0]
+            name: decoded.name,
           },
-          role: decoded.roles?.[0] || decoded.role
+          role: decoded.roles?.[0] 
         }));
       } catch (error) {
         console.error('Error token:', error);
-
-        // Limpiar token inválido
         localStorage.removeItem('token');
         sessionStorage.removeItem('token');
       }

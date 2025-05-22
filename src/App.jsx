@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { login } from "./redux/slices/authSlice";
+import { login } from "./redux/slices/AuthSlice";
 import { jwtDecode } from "jwt-decode";
 
 //Sistema
@@ -12,11 +12,11 @@ import {OlvideContrasena}  from "./auth/paciente/OlvideContrasena";
 import RestablecerContrasena from "./auth/paciente/RestablecerContrasena";
 
 //Paciente
-import HomePaciente from "./pages/patient/HomePaciente";
-import CitasPaciente from "./pages/patient/CitasPaciente";
-import PagosPaciente from "./pages/patient/PagosPaciente";
-import HistorialPaciente from "./pages/patient/HistorialPaciente";
-import ComunicacionPaciente from "./pages/patient/ComunicacionPaciente";
+import HomePaciente from "./pages/paciente/HomePaciente";
+import CitasPaciente from "./pages/paciente/CitasPaciente";
+import PagosPaciente from "./pages/paciente/PagosPaciente";
+import HistorialPaciente from "./pages/paciente/HistorialPaciente";
+import ComunicacionPaciente from "./pages/paciente/ComunicacionPaciente";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import FocusFrameLandingPage from "./pages/focusFrameLandingPage/FocusFrameLandingPage";
 import PoliticaPrivacidad from "./auth/psicologo/PoliticaPrivacidad";
@@ -44,8 +44,8 @@ function App() {
         dispatch(login({ 
           token,
           user: { 
-            email: decoded.sub || decoded.email,
-            name: decoded.name || (decoded.sub ? decoded.sub.split('@')[0] : 'Usuario') 
+            email: decoded.sub,
+            name: decoded.name,
           },
           role: decoded.roles?.[0] || decoded.role,
         }));
@@ -150,8 +150,10 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/historial-clinico" element={<CrearHistorialClinico/>} />
+
       <Route
-        path="/historial-clinico"
+        path="/pacientes/:pacienteId/historial"
         element={
           <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
             <CrearHistorialClinico />

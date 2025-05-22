@@ -5,7 +5,14 @@
 @layer utilities {
   .button-primary {
     @apply text-white px-4 py-2 rounded-lg transition-all;
-    background-image: radial-gradient(circle, #5603ad, #6b25ba, #7f3dc8, #9253d5, #a568e3);
+    background-image: radial-gradient(
+      circle,
+      #5603ad,
+      #6b25ba,
+      #7f3dc8,
+      #9253d5,
+      #a568e3
+    );
   }
 
 }

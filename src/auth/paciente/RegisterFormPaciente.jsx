@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
-import agendar from "../../img/agendar.webp";
+import ImageSection from '../../components/ImageSection/Imagen';
+import agendar1 from "../../img/agendar1.jpeg";
 
 export function RegisterFormPaciente() {
   const { pacienteId } = useParams();
@@ -87,11 +88,10 @@ export function RegisterFormPaciente() {
                 type="text"
                 id="username"
                 placeholder="Ingrese su nombre de usuario"
-                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none transition-all ${
-                  errors.username
-                    ? "border-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-primary-color"
-                }`}
+                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${errors.username
+                    ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
+                  }`}
                 {...register("username", {
                   required: "El nombre de usuario es obligatorio",
                   minLength: {
@@ -120,11 +120,10 @@ export function RegisterFormPaciente() {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Ingrese su Contraseña"
-                className={`w-full p-3 pl-12 pr-12 border rounded-lg shadow-sm focus:outline-none transition-all ${
-                  errors.password
-                    ? "border-red-500"
-                    : "border-gray-300 focus:ring-2 focus:ring-primary-color"
-                }`}
+                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${errors.password
+                    ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
+                  }`}
                 {...register("password", {
                   required: "La contraseña es obligatoria",
                   minLength: {
@@ -147,7 +146,7 @@ export function RegisterFormPaciente() {
               )}
             </div>
 
-            {/* Checkbox para aceptar términos */}
+            {/* Checkbox */}
             <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -196,35 +195,8 @@ export function RegisterFormPaciente() {
           </form>
         </div>
 
-        {/* Imagen */}
-        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/2 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-button-primary rounded-xl transition-all duration-300 hover:shadow-lg hover:bg-button-primary/90">
-          {/* Contenedor de la imagen  */}
-          <figure className="mb-6 w-full max-w-xs md:max-w-sm overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-500">
-            <img
-              src={agendar}
-              className="w-full h-auto aspect-video object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500"
-              alt="Focus Frame - Administración de calendario y citas psciologicas"
-              loading="lazy"
-              width={320}
-              height={180}
-            />
-            <figcaption className="sr-only">
-              Interfaz de FocusFrame para administración psciologica
-            </figcaption>
-          </figure>
-
-          {/* Contenedor de texto  */}
-          <div className="text-center max-w-xs md:max-w-sm">
-            <p className="text-white text-sm sm:text-base leading-relaxed">
-              Con{" "}
-              <span className="font-semibold text-secundary-color hover:text-secundary-color/80 transition-colors">
-                FocusFrame
-              </span>
-              , administra tu calendario, citas y archivos de pacientes desde
-              una interfaz unificada.
-            </p>
-          </div>
-        </div>
+        {/* Sección de imagen */}
+        <ImageSection image={agendar1} />
       </div>
     </main>
   );

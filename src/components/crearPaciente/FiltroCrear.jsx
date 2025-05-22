@@ -16,12 +16,6 @@ const FiltroCrearPaciente = () => (
           Nuevo Paciente
         </button>
       </Link>
-      <Link to="/historial-clinico">
-        <button className="rounded-full border border-violet-200 px-4 py-1 text-sm text-[#5603ad] hover:bg-violet-50 flex items-center gap-1">
-          <Plus size={14} />
-          Historial clínico
-        </button>
-      </Link>
     </div>
   </div>
 );

@@ -1,6 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play,MessageSquare,Repeat,Lock,Calendar,CheckCircle,ChevronDown,Mail,Phone,MapPin,Facebook,Github,Instagram,} from "lucide-react";
+import {
+  Play,
+  MessageSquare,
+  Repeat,
+  Lock,
+  Calendar,
+  CheckCircle,
+  ChevronDown,
+  Mail,
+  Phone,
+  MapPin,
+  Facebook,
+  Github,
+  Instagram,
+} from "lucide-react";
 import dashboard from "../../img/dashboard.png";
 import trabajoG from "../../img/trabajoG.webp";
 import logo from "../../img/logo.png";
@@ -128,7 +142,9 @@ export default function FocusFrameLandingPage() {
         <h2 className="text-4xl font-bold text-gray-900 mb-4">
           Transforma tu práctica con
         </h2>
-        <h2 className="text-4xl font-bold text-primary-color mb-4">FocusFrame</h2>
+        <h2 className="text-4xl font-bold text-primary-color mb-4">
+          FocusFrame
+        </h2>
         <p className="text-gray-600 max-w-xl mx-auto mb-6 text-center">
           Agiliza la programación de citas con un sistema intuitivo que se
           adapta a tus necesidades, permitiéndote dedicar más tiempo al cuidado
@@ -137,8 +153,10 @@ export default function FocusFrameLandingPage() {
 
         <div className="relative mt-10">
           <div className="absolute inset-0 flex justify-center items-center">
-            <button className="flex items-center gap-2 button-primary text-white px-6 py-2 rounded-full 
-            shadow-md hover:bg-primary-color transition-all duration-300 focus:ring-2 focus:ring-primary-color focus:ring-opacity-50">
+            <button
+              className="flex items-center gap-2 button-primary text-white px-6 py-2 rounded-full 
+            shadow-md hover:bg-primary-color transition-all duration-300 focus:ring-2 focus:ring-primary-color focus:ring-opacity-50"
+            >
               <Play size={18} /> Ver Video
             </button>
           </div>
@@ -176,7 +194,7 @@ export default function FocusFrameLandingPage() {
               onClick={() => handleToggle(index)}
               className={`p-6 rounded-lg shadow-lg cursor-pointer transition-all duration-300  ${
                 activeIndex === index
-                  ? "bg-gradient-to-r from-[#c084fc] to-primary-color text-white"
+                  ? "bg-gradient-to-r from-[#c084fc] to-[#c084fc] text-white"
                   : "bg-[#f3f0ff] text-[#404040]"
               }`}
             >
@@ -261,7 +279,8 @@ export default function FocusFrameLandingPage() {
       <section id="servicios" className="py-16 bg-[#faf7ff] text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Algunas <span className="text-primary-color">preguntas frecuentes</span>{" "}
+            Algunas{" "}
+            <span className="text-primary-color">preguntas frecuentes</span>{" "}
             sobre nuestro Software
           </h2>
 
@@ -301,8 +320,7 @@ export default function FocusFrameLandingPage() {
       {/*Footer */}
       <footer className="button-primary py-16">
         <div className="max-w-6xl mx-auto px-7 grid grid-cols-1 md:grid-cols-5 gap-8">
-
-          {/* Columna 1 - Logo y redes */}
+          {/*  Logo y redes */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <img className="h-8 w-8" src={logo} alt="logo" />
@@ -310,7 +328,6 @@ export default function FocusFrameLandingPage() {
             </div>
             <p className="text-white/80 mb-4">
               {" "}
-              {/* Texto blanco con 80% de opacidad */}
               La plataforma todo-en-uno para psicólogos que buscan optimizar su
               práctica y mejorar la atención a sus pacientes.
             </p>
@@ -336,7 +353,7 @@ export default function FocusFrameLandingPage() {
             </div>
           </div>
 
-          {/* Columna 2 - Enlaces */}
+          {/* Enlaces */}
           <div>
             <h4 className="font-bold text-lg mb-4 text-white">Enlaces</h4>
             <ul className="space-y-2">
@@ -375,7 +392,7 @@ export default function FocusFrameLandingPage() {
             </ul>
           </div>
 
-          {/* Columna 3 - Legal */}
+          {/* Legal */}
           <div>
             <h4 className="font-bold text-lg mb-4 text-white">Legal</h4>
             <ul className="space-y-2">
@@ -395,18 +412,10 @@ export default function FocusFrameLandingPage() {
                   Privacidad
                 </a>
               </li>
-              <li>
-                <a
-                  href="#"
-                  className="text-white/70 hover:text-white transition-colors"
-                >
-                  Cookies
-                </a>
-              </li>
             </ul>
           </div>
 
-          {/* Columna 4 - Contacto */}
+          {/* Contacto */}
           <div>
             <h4 className="font-bold text-lg mb-4 text-white">Contacto</h4>
             <ul className="space-y-3">

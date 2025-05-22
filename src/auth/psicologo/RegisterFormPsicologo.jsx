@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import {User,Mail,Lock,Eye,EyeOff,FileUser,BriefcaseBusiness,BookUser,File,FileText,} from "lucide-react";
-import agendar from "../../img/agendar.webp";
-import { errorMessages,getBackendMessage } from "../../utils/errorMessages";
+import { User, Mail, Lock, Eye, EyeOff, FileUser, BriefcaseBusiness, BookUser, File, FileText, } from "lucide-react";
+import agendar1 from "../../img/agendar1.jpeg";
+import { errorMessages, getBackendMessage } from "../../utils/errorMessages";
 import { toast, Toaster } from "sonner";
 
 const tiposDocumento = [
@@ -71,7 +71,7 @@ const validationRules = {
       message: errorMessages.validation.numeric,
     },
     validate: {
-      maxLength: (value) => 
+      maxLength: (value) =>
         value.length <= 10 || errorMessages.validation.maxLength.replace("{max}", "10"),
       validNumber: (value) => {
         const num = Number(value);
@@ -183,11 +183,11 @@ const InputField = ({
     {type === "select" ? (
       <select
         id={id}
-        className={`w-full p-3 ${
-          Icon ? "pl-12" : "pl-4"
-        } border rounded-lg shadow-sm focus:ring-primary-color focus:outline-none transition-all ${
-          errors ? "border-red-500" : "border-gray-300"
-        }`}
+        className={`w-full p-3 ${Icon ? "pl-12" : "pl-4"
+          }  border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${errors
+            ? "border-red-500 bg-red-50 focus:ring-red-200"
+            : "border-gray-300 hover:border-gray-400 focus:border-primary-color "
+          }`}
         {...register(id, validation)}
       >
         <option value="">{placeholder || "Seleccione una opción"}</option>
@@ -202,11 +202,11 @@ const InputField = ({
         id={id}
         type={type}
         placeholder={placeholder}
-        className={`w-full p-3 ${Icon ? "pl-12" : "pl-4"} pr-${
-          showPasswordToggle ? "12" : "3"
-        } border rounded-lg shadow-sm focus:ring-1 focus:ring-primary-color focus:outline-none transition-all ${
-          errors ? "border-purple-400" : "border-gray-300"
-        }`}
+        className={`w-full p-3 ${Icon ? "pl-12" : "pl-4"} pr-${showPasswordToggle ? "12" : "3"
+          } border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${errors
+            ? "border-red-500 bg-red-50 focus:ring-red-200"
+            : "border-gray-300 hover:border-gray-400 focus:border-primary-color "
+          }`}
         {...register(id, validation)}
         max={
           type === "date" ? new Date().toISOString().split("T")[0] : undefined
@@ -265,15 +265,15 @@ export function RegisterFormPsicologo() {
   const onSubmit = async (data) => {
     setMensajeError("");
     setIsLoading(true);
-  
+
     try {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          "Accept-Language": "es" 
+          "Accept-Language": "es"
         }
       };
-  
+
       if (step === 1) {
         const responsePaso1 = await axios.post(
           `http://localhost:8081/funcionario/paso1`,
@@ -284,11 +284,11 @@ export function RegisterFormPsicologo() {
           config
         );
         console.log("Respuesta completa del paso 1:", responsePaso1.data);
-        
+
         if (!responsePaso1.data?.idFuncionario) {
           throw new Error("No se recibió el ID del funcionario en la respuesta");
         }
-    
+
         const registrationData = {
           step: 2,
           idFuncionario: responsePaso1.data.idFuncionario,
@@ -299,10 +299,10 @@ export function RegisterFormPsicologo() {
         };
         localStorage.setItem('psicologoRegistration', JSON.stringify(registrationData));
         console.log("Datos guardados en localStorage:", registrationData);
-        
+
         setPsicologoId(responsePaso1.data.idFuncionario);
         setStep(2);
-  
+
       } else if (step === 2) {
         const savedDataStr = localStorage.getItem('psicologoRegistration');
         if (!savedDataStr) {
@@ -336,13 +336,13 @@ export function RegisterFormPsicologo() {
           },
           {
             ...config,
-            withCredentials: false 
+            withCredentials: false
           }
         );
 
         console.log("Respuesta del Paso 2:", responsePaso2.data);
-  
-        
+
+
         const updatedRegistrationData = {
           ...savedData,
           step: 3,
@@ -354,21 +354,21 @@ export function RegisterFormPsicologo() {
             documento: data.documento
           }
         };
-  
+
         localStorage.setItem('psicologoRegistration', JSON.stringify(updatedRegistrationData));
         console.log("Datos actualizados en localStorage:", updatedRegistrationData);
-        
+
         setPsicologoId(currentId);
         setStep(3);
-  
+
       } else if (step === 3) {
         const savedData = JSON.parse(localStorage.getItem('psicologoRegistration'));
         const currentId = psicologoId || savedData?.idUsuario;
-        
+
         if (!currentId) {
           throw new Error("Error en el flujo de registro. Por favor comience nuevamente.");
         }
-  
+
         const responsePaso3 = await axios.post(
           `http://localhost:8081/funcionario/paso3/${currentId}`,
           {
@@ -378,9 +378,9 @@ export function RegisterFormPsicologo() {
           },
           config
         );
-        
+
         localStorage.removeItem('psicologoRegistration');
-      
+
         toast.success("Registro completado con éxito");
         reset();
         navigate("/login");
@@ -391,7 +391,7 @@ export function RegisterFormPsicologo() {
 
       const errorMessage = getBackendMessage(error);
       setMensajeError(errorMessage);
-      
+
       toast.error(errorMessage, {
         duration: 7000,
         action: error.response?.status === 409 ? {
@@ -406,7 +406,7 @@ export function RegisterFormPsicologo() {
     } finally {
       setIsLoading(false);
     }
-};
+  };
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
@@ -420,27 +420,24 @@ export function RegisterFormPsicologo() {
               <React.Fragment key={num}>
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors ${
-                      step >= num
-                        ? "border-primary-color bg-primary-color text-white"
-                        : "border-gray-300 text-gray-400"
-                    }`}
+                    className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors ${step >= num
+                      ? "border-primary-color bg-primary-color text-white"
+                      : "border-gray-300 text-gray-400"
+                      }`}
                   >
                     {num}
                   </div>
                   <span
-                    className={`text-xs mt-1 font-medium ${
-                      step >= num ? "text-primary-color" : "text-gray-400"
-                    }`}
+                    className={`text-xs mt-1 font-medium ${step >= num ? "text-primary-color" : "text-gray-400"
+                      }`}
                   >
                     {num === 1 ? "Personal" : num === 2 ? "Cuenta" : "Perfil"}
                   </span>
                 </div>
                 {num < 3 && (
                   <div
-                    className={`w-8 h-0.5 ${
-                      step > num ? "bg-primary-color" : "bg-gray-200"
-                    }`}
+                    className={`w-8 h-0.5 ${step > num ? "bg-primary-color" : "bg-gray-200"
+                      }`}
                   ></div>
                 )}
               </React.Fragment>
@@ -454,15 +451,15 @@ export function RegisterFormPsicologo() {
             {step === 3
               ? "Completa tu Perfil"
               : step === 2
-              ? "Registro de Usuario"
-              : "Datos Personales"}
+                ? "Registro de Usuario"
+                : "Datos Personales"}
           </h2>
           <p className="text-gray-500 mb-6">
             {step === 3
               ? "Añade más detalles sobre tu perfil."
               : step === 2
-              ? "Crea tu cuenta para acceder."
-              : "Ingresa tu nombre y apellido."}
+                ? "Crea tu cuenta para acceder."
+                : "Ingresa tu nombre y apellido."}
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -503,9 +500,9 @@ export function RegisterFormPsicologo() {
                   validation={validationRules.tipoDocumento}
                 />
                 <InputField
-                  id="documento" 
+                  id="documento"
                   label="Número de documento"
-                  icon={FileText} 
+                  icon={FileText}
                   placeholder="Ingrese su número de documento"
                   register={register}
                   errors={errors.documento}
@@ -636,33 +633,29 @@ export function RegisterFormPsicologo() {
           </form>
         </div>
 
-        {/* Imagen */}
-        <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/2 flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 bg-button-primary rounded-xl transition-all duration-300 hover:shadow-lg hover:bg-button-primary/90">
-          {/* Contenedor de la imagen  */}
-          <figure className="mb-6 w-full max-w-xs md:max-w-sm overflow-hidden rounded-xl shadow-md hover:shadow-lg transition-all duration-500">
-            <img
-              src={agendar}
-              className="w-full h-auto aspect-video object-cover rounded-xl hover:scale-[1.02] transition-transform duration-500"
-              alt="Focus Frame - Administración de calendario y citas psciologicas"
-              loading="lazy"
-              width={320}
-              height={180}
-            />
-            <figcaption className="sr-only">
-              Interfaz de FocusFrame para administración psciologica
-            </figcaption>
-          </figure>
-
-          {/* Contenedor de texto  */}
-          <div className="text-center max-w-xs md:max-w-sm">
-            <p className="text-white text-sm sm:text-base leading-relaxed">
-              Con{" "}
-              <span className="font-semibold text-secundary-color hover:text-secundary-color/80 transition-colors">
-                FocusFrame
-              </span>
-              , administra tu calendario, citas y archivos de pacientes desde
-              una interfaz unificada.
+        {/* Sección de imagen */}
+        <div
+          className="w-full md:w-1/2 hidden md:block relative min-h-[500px] rounded-l-lg"
+          style={{
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url(${agendar1})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <div className="absolute inset-0 grid place-items-center p-6">
+            {/* Logo posicionado absolutamente arriba */}
+            <p className="absolute top-6 left-0 right-0 text-center font-sans text-primary-color/80 text-[10px] tracking-[0.3em] font-thin">
+              FOCUSFRAME
             </p>
+
+            {/* Contenido centrado */}
+            <div className="text-center space-y-3">
+              <p className="font-sans text-2xl text-white font-medium">
+                Gestión unificada de calendarios y expedientes
+              </p>
+              <div className="h-px w-16 mx-auto bg-white/30"></div>
+            </div>
           </div>
         </div>
       </div>

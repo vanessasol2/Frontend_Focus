@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, ShieldAlert,UserCog, ChevronDown, } from 'lucide-react';
+import { Lock, ShieldAlert, UserCog, ChevronDown, } from 'lucide-react';
 
 const Section = ({ icon, title, children }) => {
   const [isOpen, setIsOpen] = React.useState(true);
@@ -15,9 +15,9 @@ const Section = ({ icon, title, children }) => {
           {icon}
           <h2 className="text-xl font-semibold text-left text-gray-900">{title}</h2>
         </div>
-        <ChevronDown 
-          size={20} 
-          className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+        <ChevronDown
+          size={20}
+          className={`text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
       {isOpen && (
@@ -59,16 +59,16 @@ const PoliticaPrivacidad = () => {
       </section>
 
       {/* Sección clave mejorada */}
-      <Section 
+      <Section
         title="5. Derechos de los titulares (Habeas Data)"
         icon={<UserCog className="text-purple-600" />}
       >
         <div className="space-y-4">
           <p>
-            Usted puede ejercer estos derechos mediante solicitud escrita enviada al correo electrónico 
+            Usted puede ejercer estos derechos mediante solicitud escrita enviada al correo electrónico
             <strong className="text-purple-700"> protecciondatos@focusframe.com</strong> con:
           </p>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full border">
               <thead className="bg-purple-50">
@@ -94,13 +94,13 @@ const PoliticaPrivacidad = () => {
           </div>
 
           <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 text-sm">
-            <strong>Nota:</strong> Para solicitudes de eliminación de datos, aplican restricciones 
+            <strong>Nota:</strong> Para solicitudes de eliminación de datos, aplican restricciones
             según el artículo 15 de la Ley 1581 (conservación por obligación legal).
           </div>
         </div>
       </Section>
 
-      
+
     </div>
   );
 };

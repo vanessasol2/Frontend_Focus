@@ -12,7 +12,6 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token"); 
-    sessionStorage.removeItem("token");
     dispatch(logout()); 
     navigate("/login"); 
   };

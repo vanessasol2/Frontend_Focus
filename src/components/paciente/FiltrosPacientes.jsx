@@ -16,12 +16,6 @@ const FiltrosPacientes = ({ valorBusqueda, onChangeBusqueda }) => (
           Nuevo Paciente
         </button>
       </Link>
-      <Link to="/historial-clinico">
-        <button className="rounded-full border border-violet-200 px-4 py-1 text-sm text-[#5603ad] hover:bg-violet-50 flex items-center gap-1">
-          <Plus size={14} />
-          Historial clínico
-        </button>
-      </Link>
     </div>
     <div className="flex items-center border border-gray-200 rounded-full px-4 py-2 w-full md:w-96 focus-within:border-primary-color focus-within:ring-1 focus-within:ring-violet-200 transition-all">
       <Search size={18} className="text-gray-400 mr-2" />

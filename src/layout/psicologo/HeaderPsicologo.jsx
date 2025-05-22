@@ -6,7 +6,7 @@ import "../style/Header.css";
 const HeaderPsicologo = () => {
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
-  const userName = user?.name || "Invitado";
+  const userName = user?.name || user?.email || "Invitado";
 
   const routeNames = {
     "/home-psicologo": `Bienvenido, ${userName}`,
@@ -15,53 +15,71 @@ const HeaderPsicologo = () => {
     "/crear-paciente": "Nuevo Paciente",
     "/perfil-psicologo": "Perfil ",
     "/historial-clinico": "Historiales Médicos",
+    "/pacientes/:pacienteId/historial-clinico": "Historial Clínico"
   };
 
   const getRouteName = (path) => {
-    return routeNames[path] || path.split("/").pop().replace(/-/g, " ");
-  };
+  if (routeNames[path]) return routeNames[path];
+  
+  if (path.includes('/pacientes/') && path.includes('/historial-clinico')) {
+    return "Historial Clínico";
+  }
+  
+  return path.split("/").pop().replace(/-/g, " ");
+};;
 
   const getPageTitle = () => {
     return getRouteName(location.pathname);
   };
 
   const generateBreadcrumb = () => {
-    const paths = location.pathname.split("/").filter(Boolean);
-    if (paths.length === 0) return null;
+  const paths = location.pathname.split("/").filter(Boolean);
+  if (paths.length === 0) return null;
 
-    let currentPath = "";
-    let breadcrumbItems = [];
+  let currentPath = "";
+  let breadcrumbItems = [];
+
+  breadcrumbItems.push(
+    <li key="home">
+      <Link to="/home-psicologo" className="breadcrumb-link">
+        Inicio
+      </Link>
+    </li>
+  );
+
+  for (let i = 0; i < paths.length; i++) {
+    const path = paths[i];
+    currentPath += `/${path}`;
+    const isLast = i === paths.length - 1;
+    
+    let routeName;
+    
+    // Caso especial para rutas de pacientes
+    if (path === "pacientes" && paths[i+1] && paths[i+2] === "historial-clinico") {
+      routeName = "Historial Clínico";
+      currentPath += `/${paths[i+1]}/${paths[i+2]}`;
+      i += 2; // Saltamos los siguientes dos segmentos
+    } else {
+      routeName = getRouteName(currentPath);
+    }
 
     breadcrumbItems.push(
-      <li key="home">
-        <Link to="/home-psicologo" className="breadcrumb-link">
-          Inicio
-        </Link>
+      <li key={currentPath}>
+        {!isLast ? (
+          <Link to={currentPath} className="breadcrumb-link">
+            {routeName}
+          </Link>
+        ) : (
+          <span className="breadcrumb-active" aria-current="page">
+            {routeName}
+          </span>
+        )}
       </li>
     );
+  }
 
-    paths.forEach((path, index) => {
-      currentPath += `/${path}`;
-      const isLast = index === paths.length - 1;
-      const routeName = getRouteName(currentPath);
-
-      breadcrumbItems.push(
-        <li key={currentPath}>
-          {!isLast ? (
-            <Link to={currentPath} className="breadcrumb-link">
-              {routeName}
-            </Link>
-          ) : (
-            <span className="breadcrumb-active" aria-current="page">
-              {routeName}
-            </span>
-          )}
-        </li>
-      );
-    });
-
-    return breadcrumbItems;
-  };
+  return breadcrumbItems;
+};
 
   return (
     <header className="header" role="banner">

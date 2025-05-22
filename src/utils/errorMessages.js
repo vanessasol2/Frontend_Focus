@@ -52,7 +52,7 @@ export const errorMessages = {
   'server.error': 'Error interno del servidor',
   'network.error': 'Problema de conexión. Verifique su internet',
 
-  // Validaciones estructuradas
+  // Validaciones 
   validation: {
     required: 'Este campo es obligatorio',
     minLength: 'Debe tener al menos {min} caracteres',
@@ -69,26 +69,20 @@ export const errorMessages = {
 };
 
 export const getBackendMessage = (error, params = [], debug = false) => {
-  // string directo 
   if (typeof error === 'string') {
     return formatMessage(error, params);
   }
-  
-  // error de Axios
   if (error.isAxiosError) {
-    // Error de red (sin conexión)
     if (!error.response) {
       return errorMessages['network.error'];
     }
     
     const { data, status } = error.response;
     
-    // backend
     if (data?.errorCode && errorMessages[data.errorCode]) {
       return formatMessage(errorMessages[data.errorCode], params);
     }
-    
-    // mensaje del backend
+
     if (data?.message) {
       const backendCode = Object.keys(errorMessages).find(
         key => data.message.includes(key.replace(/\./g, ' '))
@@ -96,12 +90,10 @@ export const getBackendMessage = (error, params = [], debug = false) => {
       if (backendCode) {
         return formatMessage(errorMessages[backendCode], params);
       }
-      
-      // desarrollo
+    
       if (debug) return data.message;
     }
     
-    // estado HTTP
     switch(status) {
       case 400: return errorMessages['validation.error'];
       case 401: return 'No autorizado';
@@ -112,8 +104,6 @@ export const getBackendMessage = (error, params = [], debug = false) => {
       default: return errorMessages['server.error'];
     }
   }
-  
-  // otros tipos de error
   return debug ? error.message : errorMessages['server.error'];
 };
 

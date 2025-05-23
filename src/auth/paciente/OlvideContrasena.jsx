@@ -1,10 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { Mail, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import axios from "axios";
-import { Toaster, toast } from "sonner";
-import { getBackendMessage } from "../../utils/errorMessages";
+import { Toaster } from "sonner";
+import usePasswordReset from "../../hook/usePasswordReset";
 
 export function OlvideContrasena() {
   const {
@@ -13,60 +11,14 @@ export function OlvideContrasena() {
     formState: { errors, isValid },
   } = useForm({ mode: "onChange" });
 
-  const [cargando, setCargando] = useState(false);
-  const navigate = useNavigate();
+  const { loading, handlePasswordReset, navigate } = usePasswordReset();
 
-  const onSubmit = async (datos) => {
-    setCargando(true);
-    try {
-      const response = await axios.post(
-        "http://localhost:8081/auth/recuperarContra",
-        null,
-        {
-          params: { email: datos.email },
-          timeout: 10000 
-        }
-      );
-
-      if (response.status === 200) {
-        toast.success(
-          <div>
-            <p className="font-medium">¡Solicitud recibida!</p>
-            <p className="text-sm mt-1">
-              Si el correo existe en nuestro sistema, recibirás un enlace para
-              restablecer tu contraseña en los próximos minutos.
-            </p>
-          </div>,
-          {
-            duration: 5000,
-          }
-        );
-      }
-    } catch (error) {
-      console.error("Error al solicitar recuperación:", error);
-      const errorMessage = getBackendMessage(error);
-      
-      toast.error(
-        <div>
-          <p className="font-medium">No pudimos procesar tu solicitud</p>
-          <p className="text-sm mt-1">{errorMessage}</p>
-        </div>,
-        {
-          duration: 5000,
-          action: {
-            label: 'Reintentar',
-            onClick: () => handleSubmit(onSubmit)()
-          }
-        }
-      );
-    } finally {
-      setCargando(false);
-    }
+  const onSubmit = async (data) => {
+    await handlePasswordReset(data.email);
   };
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gradient-to-br from-content-bg to-content-bg p-4">
-      {/* Alerta*/}
       <Toaster position="top-center" richColors expand visibleToasts={3} />
 
       <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-8 mx-4">
@@ -92,9 +44,7 @@ export function OlvideContrasena() {
           </p>
         </div>
 
-        {/* Formulario*/}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Input Email  */}
           <div>
             <label
               htmlFor="email"
@@ -111,10 +61,10 @@ export function OlvideContrasena() {
                 type="email"
                 autoComplete="email"
                 placeholder="Ingresa tu correo electronico"
-                className={`block w-full pl-10 pr-3 py-3 border ${
+                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${
                   errors.email
-                    ? "border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500"
-                    : "border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-primary-color focus:border-primary-color"
+                    ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:border-primary-color "
                 } rounded-lg shadow-sm`}
                 {...register("email", {
                   required: "El correo electrónico es obligatorio",
@@ -137,14 +87,14 @@ export function OlvideContrasena() {
           <div>
             <button
               type="submit"
-              disabled={!isValid || cargando}
+              disabled={!isValid || loading}
               className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white ${
-                !isValid || cargando
+                !isValid || loading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-primary-color hover:bg-secundary-color"
               } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-color transition-colors duration-200`}
             >
-              {cargando ? (
+              {loading ? (
                 <>
                   <svg
                     className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"

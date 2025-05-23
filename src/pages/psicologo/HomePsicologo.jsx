@@ -84,19 +84,14 @@ const HomePsicologo = () => {
   return (
     <MainLayoutPsicologo>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-6 mt-8">
-        {/* Tarjetas resumen + Reuniones */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-2 gap-6 auto-rows-max">
             {resumenData.map((item, index) => (
               <ResumenCard key={index} {...item} />
             ))}
           </div>
-
-          {/*  ReunionesContenedor */}
           <ReunionesContenedor appointments={appointments} />
         </div>
-
-        {/* Calendario + Pacientes */}
         <div className="flex flex-col gap-6">
           <CalendarioSection date={date} setDate={setDate} />
           <ListaPacientes pacientes={pacientes} />

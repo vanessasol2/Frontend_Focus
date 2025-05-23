@@ -10,12 +10,9 @@ const ImageSection = ({ image }) => {
       }}
     >
       <div className="absolute inset-0 grid place-items-center p-6">
-            {/* Logo posicionado absolutamente arriba */}
             <p className="absolute top-6 left-0 right-0 text-center font-sans text-primary-color/80 text-[10px] tracking-[0.3em] font-thin">
               FOCUSFRAME
             </p>
-
-            {/* Contenido centrado */}
             <div className="text-center space-y-3">
               <p className="font-sans text-2xl text-white font-medium">
                 Gestión unificada de calendarios y expedientes

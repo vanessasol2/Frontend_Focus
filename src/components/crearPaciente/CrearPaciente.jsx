@@ -2,8 +2,7 @@ import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import FiltroCrear from "./FiltroCrear";
 import { Toaster, toast } from "sonner";
 import { ChevronDown, Loader2 } from "lucide-react";
-import { usePacienteForm } from "./hooks/usePacienteForm";
-
+import { usePacienteForm } from "../../hook/usePacienteForm"
 const CrearPaciente = () => {
   const {
     datosFormulario,
@@ -36,7 +35,7 @@ const CrearPaciente = () => {
         <div className="relative">
           <select
             id={nombre}
-            name={nombre}
+            name={nombre}            
             value={datosFormulario[nombre]}
             onChange={manejarCambio}
             className={`block w-full pl-3 pr-10 py-2.5 text-sm border ${
@@ -56,6 +55,7 @@ const CrearPaciente = () => {
                 {opcion.etiqueta}
               </option>
             ))}
+            
           </select>
           <ChevronDown
             className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 ${

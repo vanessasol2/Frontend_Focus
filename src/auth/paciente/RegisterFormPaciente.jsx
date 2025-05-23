@@ -1,68 +1,20 @@
-import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { useForm } from "react-hook-form";
+import React from "react";
 import { User, Lock, Eye, EyeOff } from "lucide-react";
-import ImageSection from '../../components/ImageSection/Imagen';
+import ImageSection from '../../components/ui/ImageSection/Imagen';
 import agendar1 from "../../img/agendar1.jpeg";
+import { useRegisterPaciente } from "../../hook/useRegisterPaciente";
 
 export function RegisterFormPaciente() {
-  const { pacienteId } = useParams();
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
-  const [mensajeError, setMensajeError] = useState("");
-
   const {
     register,
     handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm({
-    defaultValues: {
-      username: "",
-      password: "",
-      aceptaTerminos: false,
-    },
-  });
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const onSubmit = async (data) => {
-    if (!pacienteId) {
-      alert("No tienes permiso para completar el perfil");
-      return;
-    }
-
-    if (!data.aceptaTerminos) {
-      setMensajeError(
-        "Debes aceptar los Términos y Condiciones para continuar."
-      );
-      return;
-    }
-
-    setMensajeError("");
-
-    try {
-      const response = await axios.post(
-        `http://localhost:8081/paciente/completar-perfil/${pacienteId}`,
-        {
-          username: data.username,
-          password: data.password,
-        },
-        { headers: { "Content-Type": "application/json" } }
-      );
-
-      alert("Perfil completado con éxito Paciente!");
-      reset();
-      navigate("/login");
-    } catch (error) {
-      setMensajeError(
-        error.response?.data || "Hubo un error al completar el perfil"
-      );
-    }
-  };
+    errors,
+    showPassword,
+    mensajeError,
+    isSubmitting,
+    togglePasswordVisibility,
+    onSubmit,
+  } = useRegisterPaciente();
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-gray-50 p-6">
@@ -88,10 +40,11 @@ export function RegisterFormPaciente() {
                 type="text"
                 id="username"
                 placeholder="Ingrese su nombre de usuario"
-                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${errors.username
+                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${
+                  errors.username
                     ? "border-red-500 bg-red-50 focus:ring-red-200"
                     : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
-                  }`}
+                }`}
                 {...register("username", {
                   required: "El nombre de usuario es obligatorio",
                   minLength: {
@@ -120,10 +73,11 @@ export function RegisterFormPaciente() {
                 type={showPassword ? "text" : "password"}
                 id="password"
                 placeholder="Ingrese su Contraseña"
-                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${errors.password
+                className={`w-full p-3 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${
+                  errors.password
                     ? "border-red-500 bg-red-50 focus:ring-red-200"
                     : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
-                  }`}
+                }`}
                 {...register("password", {
                   required: "La contraseña es obligatoria",
                   minLength: {
@@ -182,9 +136,12 @@ export function RegisterFormPaciente() {
 
             <button
               type="submit"
-              className="w-full button-primary text-white py-3 rounded-lg transition-all"
+              disabled={isSubmitting}
+              className={`w-full button-primary text-white py-3 rounded-lg transition-all ${
+                isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Guardar
+              {isSubmitting ? "Guardando..." : "Guardar"}
             </button>
 
             {mensajeError && (

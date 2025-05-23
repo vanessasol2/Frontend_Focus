@@ -132,20 +132,19 @@
   box-shadow: 0 0 0 2px rgba(126, 91, 239, 0.3);
 }
 
-/* Eventos en vista mensual */
+
 .rbc-month-view .rbc-event {
   font-size: 0.75rem;
   padding: 4px 6px;
 }
 
 
-/* Celdas seleccionadas */
 .rbc-selected-cell {
   background-color: rgba(86, 3, 173, 0.15);
 }
 
 
-/* Scrollbar para el calendario */
+
 .rbc-time-content::-webkit-scrollbar {
   width: 6px;
 }
@@ -296,7 +295,7 @@
 }
 
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .rbc-toolbar {
     flex-direction: column;

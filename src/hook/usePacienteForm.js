@@ -1,21 +1,14 @@
 import { useState, useCallback } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { getBackendMessage } from "../../../utils/errorMessages";
+import { pacienteCreateService } from "../service/pacienteCreateService";
+import { getBackendMessage } from "../utils/errorMessages";
+import { TIPOS_DOCUMENTO } from "../utils/constants"; 
 
 const EXPRESION_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EXPRESION_TELEFONO = /^\d{10}$/;
 const EXPRESION_CC = /^[0-9]{6,12}$/;
 const EXPRESION_CE = /^[a-zA-Z0-9]{8,11}$/;
-
-const TIPOS_DOCUMENTO = [
-  { valor: "CC", etiqueta: "Cédula de Ciudadanía" },
-  { valor: "CE", etiqueta: "Cédula de Extranjería" },
-  { valor: "TI", etiqueta: "Tarjeta de Identidad" },
-  { valor: "PA", etiqueta: "Pasaporte" },
-  { valor: "RC", etiqueta: "Registro Civil" },
-];
 
 const CAMPOS_FORMULARIO = [
   {
@@ -144,23 +137,12 @@ export const usePacienteForm = () => {
     setEstaEnviando(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        "http://localhost:8081/paciente/registrar",
-        datosFormulario,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          },
-        }
-      );
+      const response = await pacienteCreateService.registrarPaciente(datosFormulario, token);
 
       const successMessage = response.data?.message || "Paciente creado exitosamente";
       toast.success(successMessage);
 
       const nuevoPacienteId = response.data.idPaciente;
-
-      console.log("ID extraído del paciente:", nuevoPacienteId);
 
       if (!nuevoPacienteId) {
         console.error("No se encontró el ID del paciente en la respuesta");
@@ -171,11 +153,10 @@ export const usePacienteForm = () => {
       navegar(`/pacientes/${nuevoPacienteId}/historial`);
     } catch (error) {
       console.error("Error al crear paciente:", error);
-      console.error("Respuesta de error:", error.response?.data);
 
       const errorMessage = getBackendMessage(error);
 
-      if (error.response?.status === 409) {
+      if (error.status === 409) {
         if (errorMessage.toLowerCase().includes("correo")) {
           setErrores((prev) => ({ ...prev, email: errorMessage }));
         } else if (errorMessage.toLowerCase().includes("documento")) {
@@ -203,4 +184,4 @@ export const usePacienteForm = () => {
     CAMPOS_FORMULARIO,
     navegar,
   };
-}
+};

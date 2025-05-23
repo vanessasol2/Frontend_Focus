@@ -6,7 +6,7 @@ import "../style/Header.css";
 const HeaderPsicologo = () => {
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
-  const userName = user?.name || user?.email || "Invitado";
+  const userName = user?.name || "Invitado";
 
   const routeNames = {
     "/home-psicologo": `Bienvenido, ${userName}`,
@@ -54,11 +54,10 @@ const HeaderPsicologo = () => {
     
     let routeName;
     
-    // Caso especial para rutas de pacientes
     if (path === "pacientes" && paths[i+1] && paths[i+2] === "historial-clinico") {
       routeName = "Historial Clínico";
       currentPath += `/${paths[i+1]}/${paths[i+2]}`;
-      i += 2; // Saltamos los siguientes dos segmentos
+      i += 2; 
     } else {
       routeName = getRouteName(currentPath);
     }

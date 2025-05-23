@@ -8,36 +8,19 @@ const ListaPacientes = () => {
   const [error, setError] = useState(null);
 
   
-  useEffect(() => {
-    const fetchPacientes = async () => {
-      try {
-        const response = await fetch("http://localhost:8081/pacientes"); 
-        if (!response.ok) throw new Error("Error al cargar pacientes");
-        const data = await response.json();
-        setPacientes(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setCargando(false);
-      }
-    };
-
-    fetchPacientes();
-  }, []);
-
   // Filtrar pacientes 
   const pacientesFiltrados = pacientes.filter((paciente) =>
     paciente.nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (cargando) return <p className="text-center text-primary-color">Cargando pacientes...</p>;
+  //if (cargando) return <p className="text-center text-primary-color">Cargando pacientes...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <div className="p-4 w-full">
       <h2 className="text-xl font-semibold text-gray-800 mb-6">Pacientes</h2>
 
-      {/* Barra de búsqueda (igual que antes) */}
+      {/* Barra de búsqueda */}
       <div className="flex items-center bg-white rounded-xl px-4 py-2 shadow-md mb-6">
         <Search className="w-5 h-5 text-primary-color mr-2" />
         <input

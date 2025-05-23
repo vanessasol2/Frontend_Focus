@@ -2,7 +2,7 @@ import React from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import useLogin from "../../hook/useLogin";
-import ImageSection from '../../components/ImageSection/Imagen';
+import ImageSection from '../../components/ui/ImageSection/Imagen';
 import agendar1 from "../../img/agendar1.jpeg";
 
 export function LoginFormPaciente() {

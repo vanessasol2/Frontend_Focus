@@ -58,6 +58,7 @@ export const errorMessages = {
     minLength: 'Debe tener al menos {min} caracteres',
     maxLength: 'No puede exceder los {max} caracteres',
     email: 'Ingrese un correo electrónico válido',
+    onlyGmail: "Solo se permiten correos electrónicos de Gmail",
     numeric: 'Solo se permiten números',
     username: 'Solo letras, números y guiones bajos',
     licencia: 'Solo letras, números y guiones',

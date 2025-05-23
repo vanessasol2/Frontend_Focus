@@ -1,234 +1,47 @@
-import React, { useState, useEffect } from "react";
-import { User, Pill, Search, Plus, Minus, Loader2 } from 'lucide-react';
-import { useNavigate, useParams } from "react-router-dom";
-import { Toaster, toast } from "sonner";
+import { User, Pill, Search, Plus, Loader2 } from 'lucide-react';
+import { Toaster,toast } from "sonner";
 import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import FiltroCrear from "../../components/crearPaciente/FiltroCrear";
-import axios from 'axios';
+import { useHistorialClinico } from "../../hook/useHistorialClinico";
+import { SectionHeader } from "../../components/ui/historialClinico/SectionHeader";
+import { CheckboxGroup } from "../../components/ui/historialClinico/CheckboxGroup";
 
-const HOBBIES_OPTIONS = [
-  { value: 'DEPORTE', label: 'Deporte' },
-  { value: 'LECTURA', label: 'Lectura' },
-  { value: 'VIDEOJUEGOS', label: 'Videojuegos' },
-  { value: 'MUSICA', label: 'Música' },
-  { value: 'COCINA', label: 'Cocina' },
-  { value: 'OTRO', label: 'Otro' }
-];
-
-const MEDICAMENTOS_OPTIONS = [
-  { value: 'Metformina', label: 'Metformina' },
-  { value: 'Losartán', label: 'Losartán' },
-  { value: 'Salbutamol', label: 'Salbutamol' },
-  { value: 'Fluoxetina', label: 'Fluoxetina' },
-  { value: 'Alprazolam', label: 'Alprazolam' },
-  { value: 'Ibuprofeno', label: 'Ibuprofeno' },
-  { value: 'Aspirina', label: 'Aspirina' },
-  { value: 'Paracetamol', label: 'Paracetamol' },
-  { value: 'Amoxicilina', label: 'Amoxicilina' },
-  { value: 'Ciprofloxacino', label: 'Ciprofloxacino' },
-  { value: 'Omeprazol', label: 'Omeprazol' },
-  { value: 'Simvastatina', label: 'Simvastatina' },
-  { value: 'Lisinopril', label: 'Lisinopril' },
-  { value: 'Sertralina', label: 'Sertralina' },
-  { value: 'Diazepam', label: 'Diazepam' },
-  { value: 'Otro', label: 'Otro' }
-];
-
-const ENFERMEDADES_OPTIONS = [
-  { value: 'Diabetes', label: 'Diabetes' },
-  { value: 'Hipertension', label: 'Hipertensión' },
-  { value: 'Asma', label: 'Asma' },
-  { value: 'Depresion', label: 'Depresión' },
-  { value: 'Ansiedad', label: 'Ansiedad' },
-  { value: 'Artritis', label: 'Artritis' },
-  { value: 'Migrana', label: 'Migraña' },
-  { value: 'Esquizofrenia', label: 'Esquizofrenia' },
-  { value: 'TDAH', label: 'TDAH' },
-  { value: 'Autismo', label: 'Autismo' },
-  { value: 'Epilepsia', label: 'Epilepsia' },
-  { value: 'Cancer', label: 'Cáncer' },
-  { value: 'EnfermedadCardiaca', label: 'Enfermedad cardiaca' },
-  { value: 'Obesidad', label: 'Obesidad' },
-  { value: 'Alzheimer', label: 'Alzheimer' },
-  { value: 'ninguna', label: 'Ninguna' },
-  { value: 'otro', label: 'Otro' }
-];
 
 const CrearHistorialClinico = () => {
-  const navigate = useNavigate();
-  const { pacienteId } = useParams();
+  const {
+    historial,
+    loading,
+    error,
+    pacienteId,
+    HOBBIES_OPTIONS,
+    MEDICAMENTOS_OPTIONS,
+    ENFERMEDADES_OPTIONS,
+    handleChange,
+    handleCheckboxChange,
+    handleSubmit
+  } = useHistorialClinico();
 
-  const [historial, setHistorial] = useState({
-    hobbies: [],
-    otroHobbie: '',
-    medicamentos: [],
-    otroMedicamento: '',
-    enfermedades: [],
-    otraEnfermedad: '',
-    ocupacion: '',
-    observacionesGenerales: '',
-    contactoEmergencia: {
-      nombre: '',
-      apellido: '',
-      parentesco: '',
-      telefono: '',
-      correo: ''
-    }
-  });
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!pacienteId) {
-      console.error('Error: No se recibió el ID del paciente');
-      setError('No se encontró el ID del paciente');
-      toast.error('No se encontró el ID del paciente');
-    }
-  }, [pacienteId]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const handleCancel = () => {
+    const hasData = Object.values(historial).some(
+      val => (typeof val === 'string' && val.trim() !== '') || 
+             (typeof val === 'object' && Object.values(val).some(v => v.trim() !== ''))
+    );
     
-    if (name.startsWith('contactoEmergencia.')) {
-      const field = name.split('.')[1];
-      setHistorial(prev => ({
-        ...prev,
-        contactoEmergencia: {
-          ...prev.contactoEmergencia,
-          [field]: value
+    if (hasData) {
+      toast('¿Deseas cancelar el registro?', {
+        description: 'Los datos no guardados se perderán',
+        action: {
+          label: 'Confirmar',
+          onClick: () => navigate(-1)
+        },
+        cancel: {
+          label: 'Continuar'
         }
-      }));
-    } else {
-      setHistorial(prev => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleCheckboxChange = (type, value) => {
-    setHistorial(prev => {
-      const currentArray = [...prev[type]];
-      const index = currentArray.indexOf(value);
-      
-      if (index === -1) {
-        currentArray.push(value);
-      } else {
-        currentArray.splice(index, 1);
-        if(index === -1){
-          currentArray.push(value);
-        } else{
-          currentArray.splice(index,1);
-          if(value ==='OTRO' && type === 'hobbies'){
-            return{...prev, [type]:currentArray,otroHobbie:''};
-          }else if (value === 'Otro' && type === 'medicamentos'){
-            return{...prev,[type]:currentArray,otroMedicamento:''};
-          }else if (value === 'otro' && type ==='enfermedades'){
-            return{...prev, [type]: currentArray,otraEnfermedad:""};
-          }
-        }
-      }
-      return { ...prev, [type]: currentArray };
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!pacienteId) {
-      toast.error('ID de paciente no definido');
-      return;
-    }
-
-    if (!historial.contactoEmergencia.nombre || !historial.contactoEmergencia.telefono) {
-      toast.error('Nombre y teléfono de contacto de emergencia son obligatorios');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setError(null);
-
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
-      const dataToSend = {
-        hobbies: historial.hobbies,
-        otroHobbie: historial.hobbies.includes('OTRO')? historial.otroHobbie || null : null,
-        medicamentos: historial.medicamentos,
-        otroMedicamento: historial.medicamentos.includes('Otro') ? historial.otroMedicamento || null : null,
-        enfermedades: historial.enfermedades,
-        otraEnfermedad: historial.enfermedades.includes('otro')?historial.otraEnfermedad || null : null,
-        ocupacion: historial.ocupacion,
-        observacionesGenerales: historial.observacionesGenerales,
-        contactoEmergencia: historial.contactoEmergencia
-      };
-
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      };
-
-      await axios.post(
-        `http://localhost:8081/historialClinico/crearHistorial/${pacienteId}`,
-        dataToSend,
-        config
-      );
-
-      toast.success('Historial clínico guardado con éxito', {
-        duration: 2000,
-        position: 'top-center'
       });
-
-      setTimeout(() => {
-        navigate('/pacientes'); 
-      }, 2000);
-
-    } catch (error) {
-      console.error('Error al guardar el historial:', error);
-      let errorMessage = 'Error al guardar el historial';
-      
-      if (error.response) {
-        if (error.response.status === 403) {
-          errorMessage = 'Acceso denegado. Tu sesión puede haber expirado.';
-        } else if (error.response.data?.message) {
-          errorMessage = error.response.data.message;
-        }
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
+    } else {
+      navigate(-1);
     }
   };
-
-  const SectionHeader = ({ icon: Icon, title, color = "text-primary-600" }) => (
-    <div className="flex items-center mb-4 pb-2 border-b border-gray-200">
-      <Icon className={`w-5 h-5 mr-2 ${color}`} />
-      <h2 className={`text-lg font-semibold ${color}`}>{title}</h2>
-    </div>
-  );
-
-  const CheckboxGroup = ({ options, selectedValues, onChange, type }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-      {options.map((option) => (
-        <label key={option.value} className="flex items-center space-x-2 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={selectedValues.includes(option.value)}
-            onChange={() => onChange(type, option.value)}
-            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-          />
-          <span className="text-sm text-gray-700">{option.label}</span>
-        </label>
-      ))}
-    </div>
-  );
 
   return (
     <MainLayoutPsicologo>
@@ -268,7 +81,7 @@ const CrearHistorialClinico = () => {
                   type="hobbies"
                 />
                 
-                {historial.hobbies.includes('otro') && (
+                {historial.hobbies.includes('OTRO') && (
                   <div className="mt-4">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Especificar otro hobbie
@@ -280,7 +93,7 @@ const CrearHistorialClinico = () => {
                       onChange={handleChange}
                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                       placeholder="Ingrese otro hobbie"
-                      disabled={isSubmitting}
+                      disabled={loading}
                     />
                   </div>
                 )}
@@ -303,7 +116,7 @@ const CrearHistorialClinico = () => {
                     type="medicamentos"
                   />
                   
-                  {historial.medicamentos.includes('otro') && (
+                  {historial.medicamentos.includes('Otro') && (
                     <div className="mt-4">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Especificar otro medicamento
@@ -315,7 +128,7 @@ const CrearHistorialClinico = () => {
                         onChange={handleChange}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Ingrese otro medicamento"
-                        disabled={isSubmitting}
+                        disabled={loading}
                       />
                     </div>
                   )}
@@ -344,7 +157,7 @@ const CrearHistorialClinico = () => {
                         onChange={handleChange}
                         className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                         placeholder="Ingrese otra enfermedad"
-                        disabled={isSubmitting}
+                        disabled={loading}
                       />
                     </div>
                   )}
@@ -369,7 +182,7 @@ const CrearHistorialClinico = () => {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Ingrese la ocupación del paciente"
                     required
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -385,7 +198,7 @@ const CrearHistorialClinico = () => {
                   rows={4}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Ingrese observaciones relevantes sobre el paciente"
-                  disabled={isSubmitting}
+                  disabled={loading}
                 />
               </div>
             </section>
@@ -407,7 +220,7 @@ const CrearHistorialClinico = () => {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Nombre del contacto"
                     required
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
 
@@ -422,7 +235,7 @@ const CrearHistorialClinico = () => {
                     onChange={handleChange}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Apellido del contacto"
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
 
@@ -438,7 +251,7 @@ const CrearHistorialClinico = () => {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Parentesco con el paciente"
                     required
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
 
@@ -454,7 +267,7 @@ const CrearHistorialClinico = () => {
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Número de teléfono"
                     required
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
 
@@ -469,7 +282,7 @@ const CrearHistorialClinico = () => {
                     onChange={handleChange}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
                     placeholder="Correo electrónico"
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -479,37 +292,18 @@ const CrearHistorialClinico = () => {
             <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
               <button
                 type="button"
-                onClick={() => {
-                  const hasData = Object.values(historial).some(
-                    val => (typeof val === 'string' && val.trim() !== '') || 
-                           (typeof val === 'object' && Object.values(val).some(v => v.trim() !== ''))
-                  )
-                  if (hasData) {
-                    toast('¿Deseas cancelar el registro?', {
-                      description: 'Los datos no guardados se perderán',
-                      action: {
-                        label: 'Confirmar',
-                        onClick: () => navigate(-1)
-                      },
-                      cancel: {
-                        label: 'Continuar'
-                      }
-                    });
-                  } else {
-                    navigate(-1);
-                  }
-                }}
+                onClick={handleCancel}
                 className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
-                disabled={isSubmitting}
+                disabled={loading}
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={loading}
                 className="px-5 py-2.5 text-sm font-medium text-white bg-primary-color rounded-lg hover:bg-primary-color focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:bg-primary-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
               >
-                {isSubmitting ? (
+                {loading ? (
                   <>
                     <Loader2 className="animate-spin mr-2 h-4 w-4" />
                     Guardando...

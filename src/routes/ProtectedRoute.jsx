@@ -9,12 +9,9 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   if (!token) {
     return <Navigate to="/login" />;
   }
-
-  // Decodifica 
   const decoded = jwtDecode(token);
   const userRoles = decoded.roles;
 
-  // Si el rol del usuario no está permitido, redirige a la página de acceso denegado
   if (!allowedRoles.some(role => userRoles.includes(role))) {
     return <Navigate to="/access-denied" />;
   }

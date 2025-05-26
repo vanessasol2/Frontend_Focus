@@ -1,7 +1,7 @@
 import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import FiltroCrear from "./FiltroCrear";
 import { Toaster, toast } from "sonner";
-import { ChevronDown, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { usePacienteForm } from "../../hook/usePacienteForm"
 const CrearPaciente = () => {
   const {
@@ -31,39 +31,6 @@ const CrearPaciente = () => {
         )}
       </div>
 
-      {tipo === "select" ? (
-        <div className="relative">
-          <select
-            id={nombre}
-            name={nombre}            
-            value={datosFormulario[nombre]}
-            onChange={manejarCambio}
-            className={`block w-full pl-3 pr-10 py-2.5 text-sm border ${
-              errores[nombre]
-                ? "border-red-500 bg-red-50 focus:ring-red-200"
-                : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
-            } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-color transition-all`}
-            aria-invalid={!!errores[nombre]}
-            aria-describedby={errores[nombre] ? `${nombre}-error` : undefined}
-            disabled={estaEnviando}
-          >
-            <option value="" disabled className="text-gray-400">
-              Seleccione una opción
-            </option>
-            {opciones.map((opcion) => (
-              <option key={opcion.valor} value={opcion.valor}>
-                {opcion.etiqueta}
-              </option>
-            ))}
-            
-          </select>
-          <ChevronDown
-            className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-              errores[nombre] ? "text-red-500" : "text-gray-400"
-            } pointer-events-none`}
-          />
-        </div>
-      ) : (
         <input
           id={nombre}
           name={nombre}
@@ -86,8 +53,7 @@ const CrearPaciente = () => {
           aria-describedby={errores[nombre] ? `${nombre}-error` : undefined}
           disabled={estaEnviando}
         />
-      )}
-
+    
       {errores[nombre] && (
         <p id={`${nombre}-error`} className="mt-1 text-xs text-red-600">
           {errores[nombre]}
@@ -130,6 +96,7 @@ const CrearPaciente = () => {
                 type="button"
                 onClick={() => {
                   if (Object.values(datosFormulario).some(val => val !== '')) {
+                    console.log(datosFormulario)
                     toast('¿Seguro que deseas cancelar? Los datos no guardados se perderán.', {
                       action: {
                         label: 'Confirmar',

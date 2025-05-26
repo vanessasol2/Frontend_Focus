@@ -27,14 +27,7 @@ const CAMPOS_FORMULARIO = [
     requerido: true,
     title: "Ingresa el apellido del paciente",
   },
-  {
-    nombre: "tipoDoc",
-    etiqueta: "Tipo de Documento",
-    tipo: "select",
-    opciones: TIPOS_DOCUMENTO,
-    requerido: true,
-    title: "Selecciona el tipo de documento",
-  },
+
   {
     nombre: "documento",
     etiqueta: "Número de Documento",

@@ -421,7 +421,7 @@ export default function FocusFrameLandingPage() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-white/70">
                 <Mail size={16} className="text-white" />
-                <span>contacto@focusframe.com</span>
+                <span>focusframepsychology@gmail.com</span>
               </li>
               <li className="flex items-center gap-2 text-white/70">
                 <Phone size={16} className="text-white" />

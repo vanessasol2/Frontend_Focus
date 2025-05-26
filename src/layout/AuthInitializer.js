@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+/*import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { login } from './redux/slices/autbSlice';
+import { login } from './redux/slices/AuthSlice';
 import { jwtDecode } from 'jwt-decode';
 
 const AuthInitializer = ({ children }) => {
@@ -30,4 +30,4 @@ const AuthInitializer = ({ children }) => {
   return children;
 };
 
-export default AuthInitializer;
+export default AuthInitializer;*/

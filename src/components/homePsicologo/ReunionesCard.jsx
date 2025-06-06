@@ -1,3 +1,5 @@
+import React from 'react';
+
 const ReunionesCard = ({ client, status, time, date }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 mb-4 cursor-pointer">

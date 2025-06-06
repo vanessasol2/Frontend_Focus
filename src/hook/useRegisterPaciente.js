@@ -2,12 +2,12 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import pacienteService from "../service/pacienteService";
+import { toast } from "sonner";
 
 export const useRegisterPaciente = () => {
   const { pacienteId } = useParams();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [mensajeError, setMensajeError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -29,16 +29,15 @@ export const useRegisterPaciente = () => {
 
   const onSubmit = async (data) => {
     if (!pacienteId) {
-      setMensajeError("No tienes permiso para completar el perfil");
+      toast.error("No tienes permiso para completar el perfil");
       return;
     }
 
     if (!data.aceptaTerminos) {
-      setMensajeError("Debes aceptar los Términos y Condiciones para continuar.");
+      toast.error("Debes aceptar los Términos y Condiciones para continuar."); 
       return;
     }
 
-    setMensajeError("");
     setIsSubmitting(true);
 
     try {
@@ -47,12 +46,13 @@ export const useRegisterPaciente = () => {
         password: data.password,
       });
 
-      // Éxito
+      toast.success("Perfil completado correctamente"); 
+
       reset();
       navigate("/login");
       return { success: true };
     } catch (error) {
-      setMensajeError(error.message);
+      toast.error(error.message || "Ocurrió un error al registrar el paciente");
       return { success: false, error };
     } finally {
       setIsSubmitting(false);
@@ -64,7 +64,6 @@ export const useRegisterPaciente = () => {
     handleSubmit,
     errors,
     showPassword,
-    mensajeError,
     isSubmitting,
     togglePasswordVisibility,
     onSubmit,

@@ -10,7 +10,6 @@ export function RegisterFormPaciente() {
     handleSubmit,
     errors,
     showPassword,
-    mensajeError,
     isSubmitting,
     togglePasswordVisibility,
     onSubmit,
@@ -144,11 +143,6 @@ export function RegisterFormPaciente() {
               {isSubmitting ? "Guardando..." : "Guardar"}
             </button>
 
-            {mensajeError && (
-              <p className="text-red-500 text-sm text-center mt-2">
-                {mensajeError}
-              </p>
-            )}
           </form>
         </div>
 

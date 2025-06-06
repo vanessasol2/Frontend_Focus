@@ -1,3 +1,5 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
@@ -18,5 +20,12 @@ const MainLayout = ({ children }) => {
   );
 };
 
-export default MainLayout;
+// Validaciones de PropTypes
+MainLayout.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node
+  ]).isRequired
+};
 
+export default MainLayout;

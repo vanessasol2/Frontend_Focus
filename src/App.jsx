@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -28,6 +29,7 @@ import CitasPsicologo from "./pages/psicologo/CitasPsicologo";
 import CrearPaciente from "./components/crearPaciente/CrearPaciente";
 import CrearHistorialClinico from "./components/crearHistorialClinico/CrearHistorialClinico";
 import PerfilPsicologo from "./pages/psicologo/PerfilPsicologo"
+import HistorialClinicoPaciente from "./pages/psicologo/HistorialClinicoPaciente"
 
 function App() {
   const dispatch = useDispatch();
@@ -165,6 +167,14 @@ function App() {
         element={
           <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
             <PerfilPsicologo />
+          </ProtectedRoute>
+        }
+      />
+       <Route
+        path="/historial-clinico/:id"
+        element={
+          <ProtectedRoute allowedRoles={["PSICOLOGO"]}>
+            <HistorialClinicoPaciente />
           </ProtectedRoute>
         }
       />

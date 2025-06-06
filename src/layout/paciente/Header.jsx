@@ -1,3 +1,4 @@
+import React from 'react';
 import { useLocation, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Notificaciones from "../../components/header/Notifications";

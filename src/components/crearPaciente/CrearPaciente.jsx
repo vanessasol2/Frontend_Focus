@@ -1,3 +1,4 @@
+import React from 'react';
 import MainLayoutPsicologo from "../../layout/psicologo/MainLayoutPsicologo";
 import FiltroCrear from "./FiltroCrear";
 import { Toaster, toast } from "sonner";
@@ -31,29 +32,28 @@ const CrearPaciente = () => {
         )}
       </div>
 
-        <input
-          id={nombre}
-          name={nombre}
-          type={tipo}
-          value={datosFormulario[nombre]}
-          onChange={manejarCambio}
-          placeholder={ejemplo}
-          title={ejemplo}
-          className={`w-full px-3 py-2.5 text-sm border rounded-lg ${
-            errores[nombre]
-              ? "border-red-500 bg-red-50 focus:ring-red-200"
-              : "border-gray-300 hover:border-primary-color focus:border-primary-color"
+      <input
+        id={nombre}
+        name={nombre}
+        type={tipo}
+        value={datosFormulario[nombre]}
+        onChange={manejarCambio}
+        placeholder={ejemplo}
+        title={ejemplo}
+        className={`w-full px-3 py-2.5 text-sm border rounded-lg ${errores[nombre]
+            ? "border-red-500 bg-red-50 focus:ring-red-200"
+            : "border-gray-300 hover:border-primary-color focus:border-primary-color"
           } focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all`}
-          max={
-            nombre === "fechaNacimiento"
-              ? new Date().toISOString().split("T")[0]
-              : undefined
-          }
-          aria-invalid={!!errores[nombre]}
-          aria-describedby={errores[nombre] ? `${nombre}-error` : undefined}
-          disabled={estaEnviando}
-        />
-    
+        max={
+          nombre === "fechaNacimiento"
+            ? new Date().toISOString().split("T")[0]
+            : undefined
+        }
+        aria-invalid={!!errores[nombre]}
+        aria-describedby={errores[nombre] ? `${nombre}-error` : undefined}
+        disabled={estaEnviando}
+      />
+
       {errores[nombre] && (
         <p id={`${nombre}-error`} className="mt-1 text-xs text-red-600">
           {errores[nombre]}
@@ -64,26 +64,27 @@ const CrearPaciente = () => {
 
   return (
     <MainLayoutPsicologo>
-      <Toaster 
-        richColors 
-        position="top-center" 
+      <Toaster
+        richColors
+        position="top-center"
         toastOptions={{
           style: { fontFamily: 'inherit', fontSize: '0.875rem' },
-          duration: 3000
-        }} 
+          duration: 5000
+        }}
       />
-      
+
       <div className="p-4 md:p-6 mt-4">
         <FiltroCrear />
 
-        <div className="max-w-6xl mx-auto p-6 md:p-8">
+        <div className="max-w-6xl mx-auto p-4 md:p-8">
           <div className="mb-8">
             <h1 className="text-2xl font-bold text-gray-800">
               Registrar Nuevo Paciente
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              Complete todos los campos obligatorios (*) para registrar un nuevo paciente
+            <p className="text-sm text-gray-600 max-w-2xl">
+              Complete todos los campos obligatorios (<span className="text-red-500">*</span>) para registrar un nuevo paciente
             </p>
+
           </div>
 
           <form onSubmit={manejarEnvio} className="space-y-6">

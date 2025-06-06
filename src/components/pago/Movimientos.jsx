@@ -1,3 +1,4 @@
+import React from 'react';
 const Movimientos = () => {
     const movimientos = [
       { id: 3, tipo: "Pago en línea", año: "2024", mes: "Junio", fecha: "10/06/2024", valor: "-314,300", estado: "Pagado" },

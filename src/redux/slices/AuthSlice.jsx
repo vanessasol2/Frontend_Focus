@@ -43,12 +43,11 @@ const authSlice = createSlice({
       };
     },
     logout: (state) => {
-      state.isAuthenticated = false;
-      state.user = null;
-      state.role = null;
-      state.token = null;
-      localStorage.removeItem('token');
-    }
+  state.isAuthenticated = false;
+  state.user = null;       
+  state.token = null;     
+  localStorage.clear();    
+},
   }
 });
 

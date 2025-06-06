@@ -1,3 +1,4 @@
+import React from 'react';
 import { UserCircle, Lock } from "lucide-react";
 
 const SidebarPerfil = ({ activeTab, setActiveTab }) => {

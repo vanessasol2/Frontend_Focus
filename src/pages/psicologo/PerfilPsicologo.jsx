@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import MainLayoutPsicologo from '../../layout/psicologo/MainLayoutPsicologo';
 import Perfil from '../../components/perfilPsicologo/Perfil';

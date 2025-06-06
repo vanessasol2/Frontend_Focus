@@ -1,3 +1,4 @@
+import React from 'react';
 import { Edit2, X, User, Mail, Phone, Check, UserCircle } from "lucide-react";
 
 const Perfil = ({ profilePic, setProfilePic, editMode, setEditMode, userData, setUserData }) => {

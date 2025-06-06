@@ -2,18 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Play,
-  MessageSquare,
   Repeat,
   Lock,
   Calendar,
   CheckCircle,
   ChevronDown,
   Mail,
-  Phone,
   MapPin,
-  Facebook,
   Github,
-  Instagram,
 } from "lucide-react";
 import dashboard from "../../img/dashboard.png";
 import trabajoG from "../../img/trabajoG.webp";
@@ -21,15 +17,15 @@ import logo from "../../img/logo.png";
 
 const tarjetas = [
   {
-    title: "Comunicación Segura con Pacientes",
+    title: "Recuperación de Contraseña Segura",
     description:
-      "Mantén conversaciones privadas y seguras con tus pacientes a través de un entorno cifrado y protegido.",
-    icon: <MessageSquare size={28} className="text-primary-color" />,
+      "Protegemos el proceso de recuperación de contraseña con múltiples capas de seguridad, incluyendo verificación de identidad y enlaces temporales, para garantizar que solo el usuario legítimo pueda restablecer su acceso.",
+    icon: <Lock size={28} className="text-primary-color" />,
   },
   {
-    title: "Intercambio de Recursos",
+    title: "Historial Clínico",
     description:
-      "Comparte guías, ejercicios y cualquier recurso útil directamente a través de FocusFrame, facilitando el acceso inmediato y seguro para tus pacientes.",
+      "Accede y gestiona el historial clínico completo de tus pacientes de manera organizada, segura y centralizada dentro de FocusFrame.",
     icon: <Repeat size={28} className="text-primary-color" />,
   },
   {
@@ -49,7 +45,7 @@ const faqs = [
   {
     question: "¿Qué es FocusFrame?",
     answer:
-      "FocusFrame es una plataforma todo-en-uno diseñada para psicólogos, que facilita la gestión de citas, el seguimiento del progreso de los pacientes, la facturación y la comunicación segura, permitiendo a los profesionales centrarse en brindar el mejor cuidado posible a sus pacientes.",
+      "FocusFrame es una plataforma todo en uno diseñada para psicólogos, que facilita la gestión de citas, el seguimiento del progreso de los pacientes, permitiendo a los profesionales centrarse en brindar el mejor cuidado posible a sus pacientes.",
   },
   {
     question: "¿Cómo puedo empezar a usar FocusFrame?",
@@ -67,15 +63,10 @@ const faqs = [
       "Sí, ofrecemos soporte técnico dedicado disponible las 24 horas para ayudarte con cualquier inconveniente.",
   },
   {
-    question: "¿Puedo acceder a FocusFrame desde dispositivos móviles?",
-    answer:
-      "Claro, nuestra plataforma es completamente accesible desde cualquier dispositivo con conexión a internet.",
+    question: "¿Puedo acceder a FocusFrame desde dispositivos como laptops, tablets o computadoras ?",
+    answer: "Sí, FocusFrame es compatible con cualquier dispositivo (laptops, tablets, computadoras) siempre que tenga conexión a internet."
   },
-  {
-    question: "¿Qué sucede con mis datos si decido cancelar mi suscripción?",
-    answer:
-      "Si decides cancelar tu suscripción, tendrás la opción de exportar tus datos antes de que se eliminen de nuestros servidores.",
-  },
+
 ];
 
 export default function FocusFrameLandingPage() {
@@ -146,7 +137,7 @@ export default function FocusFrameLandingPage() {
           FocusFrame
         </h2>
         <p className="text-gray-600 max-w-xl mx-auto mb-6 text-center">
-          Agiliza la programación de citas con un sistema intuitivo que se
+          Agiliza la programación de citas para psicólogos con un sistema intuitivo que se
           adapta a tus necesidades, permitiéndote dedicar más tiempo al cuidado
           de tus pacientes.
         </p>
@@ -192,11 +183,10 @@ export default function FocusFrameLandingPage() {
             <div
               key={index}
               onClick={() => handleToggle(index)}
-              className={`p-6 rounded-lg shadow-lg cursor-pointer transition-all duration-300  ${
-                activeIndex === index
-                  ? "bg-gradient-to-r from-[#c084fc] to-[#c084fc] text-white"
-                  : "bg-[#f3f0ff] text-[#404040]"
-              }`}
+              className={`p-6 rounded-lg shadow-lg cursor-pointer transition-all duration-300  ${activeIndex === index
+                ? "bg-gradient-to-r from-[#c084fc] to-[#c084fc] text-white"
+                : "bg-[#f3f0ff] text-[#404040]"
+                }`}
             >
               <div className="flex flex-col items-center mb-4">
                 {tarjeta.icon}
@@ -288,9 +278,8 @@ export default function FocusFrameLandingPage() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className={`border-b last:border-none transition-all duration-300 ${
-                  openIndex === index ? "bg-[#f3f0ff] rounded-xl" : ""
-                }`}
+                className={`border-b last:border-none transition-all duration-300 ${openIndex === index ? "bg-[#f3f0ff] rounded-xl" : ""
+                  }`}
               >
                 <button
                   onClick={() => toggleQuestion(index)}
@@ -299,11 +288,10 @@ export default function FocusFrameLandingPage() {
                   {faq.question}
                   <ChevronDown
                     size={20}
-                    className={`transition-transform duration-300 ${
-                      openIndex === index
-                        ? "rotate-180 text-[#7e22ce]"
-                        : "text-gray-500"
-                    }`}
+                    className={`transition-transform duration-300 ${openIndex === index
+                      ? "rotate-180 text-[#7e22ce]"
+                      : "text-gray-500"
+                      }`}
                   />
                 </button>
                 {openIndex === index && (
@@ -336,19 +324,7 @@ export default function FocusFrameLandingPage() {
                 href="#"
                 className="text-white/70 hover:text-white transition-colors"
               >
-                <Facebook size={20} />
-              </a>
-              <a
-                href="#"
-                className="text-white/70 hover:text-white transition-colors"
-              >
                 <Github size={20} />
-              </a>
-              <a
-                href="#"
-                className="text-white/70 hover:text-white transition-colors"
-              >
-                <Instagram size={20} />
               </a>
             </div>
           </div>
@@ -422,10 +398,6 @@ export default function FocusFrameLandingPage() {
               <li className="flex items-center gap-2 text-white/70">
                 <Mail size={16} className="text-white" />
                 <span>focusframepsychology@gmail.com</span>
-              </li>
-              <li className="flex items-center gap-2 text-white/70">
-                <Phone size={16} className="text-white" />
-                <span>+1 (555) 123-4567</span>
               </li>
               <li className="flex items-center gap-2 text-white/70">
                 <MapPin size={16} className="text-white" />

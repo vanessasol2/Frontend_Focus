@@ -1,3 +1,5 @@
+import React from 'react';
+import PropTypes from "prop-types";
 import { Eye, EyeOff} from "lucide-react";
 
 export const InputField = ({
@@ -14,7 +16,19 @@ export const InputField = ({
   showPassword = false,
   onTogglePassword = null,
   className = "",
+  capitalize = false, 
 }) => {
+  const { ref, ...rest } = register(id, validation);
+
+  const handleBlur = (e) => {
+    if (capitalize && e.target.value) {
+      e.target.value = e.target.value
+        .toLowerCase()
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+    rest.onBlur?.(e); 
+  };
+
   return (
     <div className={`relative mb-7 ${className}`}>
       <label htmlFor={id} className="sr-only">
@@ -34,7 +48,8 @@ export const InputField = ({
               ? "border-red-500 bg-red-50 focus:ring-red-200"
               : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
             }`}
-          {...register(id, validation)}
+          {...rest}
+          ref={ref}
         >
           <option value="">{placeholder || "Seleccione una opción"}</option>
           {options?.map((option) => (
@@ -44,30 +59,37 @@ export const InputField = ({
           ))}
         </select>
       ) : (
-        <input
-          id={id}
-          type={type}
-          placeholder={placeholder}
-          className={`w-full p-3 ${Icon ? "pl-12" : "pl-4"} pr-${showPasswordToggle ? "12" : "3"
-            } border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${errors
-              ? "border-red-500 bg-red-50 focus:ring-red-200"
-              : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
+        <>
+          <input
+            id={id}
+            type={type}
+            placeholder={placeholder}
+            className={`w-full p-3 ${Icon ? "pl-12" : "pl-4"} pr-${
+              showPasswordToggle ? "12" : "3"
+            } border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-violet-300 transition-all ${
+              errors
+                ? "border-red-500 bg-red-50 focus:ring-red-200"
+                : "border-gray-300 hover:border-gray-400 focus:border-primary-color"
             }`}
-          {...register(id, validation)}
-          max={
-            type === "date" ? new Date().toISOString().split("T")[0] : undefined
-          }
-        />
-      )}
-      {showPasswordToggle && (
-        <button
-          type="button"
-          onClick={onTogglePassword}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-          aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-        >
-          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-        </button>
+            {...rest}
+            ref={ref}
+            onBlur={handleBlur}
+            style={capitalize ? { textTransform: 'capitalize' } : {}}
+            max={
+              type === "date" ? new Date().toISOString().split("T")[0] : undefined
+            }
+          />
+          {showPasswordToggle && (
+            <button
+              type="button"
+              onClick={onTogglePassword}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          )}
+        </>
       )}
       {errors && (
         <p className="absolute -bottom-5 left-0 text-sm text-red-500">

@@ -1,0 +1,79 @@
+/* Estilos para la tarjeta de reunión */
+.meeting-card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 320px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.meeting-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.time-badge {
+  background: #f5f5f5;
+  color: #666;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.meeting-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.meeting-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.divider {
+  width: 1px;
+  height: 14px;
+  background: #e0e0e0;
+}
+
+.meeting-type {
+  color: #5603ad;
+  font-weight: 500;
+}
+
+.client-name {
+  font-weight: 500;
+}
+
+.meeting-location {
+  font-style: italic;
+}
+
+/* Versión responsive */
+@media (max-width: 480px) {
+  .meeting-card {
+    padding: 18px;
+    max-width: 100%;
+  }
+  
+  .meeting-title {
+    font-size: 16px;
+  }
+  
+  .meeting-details {
+    font-size: 13px;
+    gap: 6px;
+  }
+}

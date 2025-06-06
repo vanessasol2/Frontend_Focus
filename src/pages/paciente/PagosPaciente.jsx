@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from "react";
 import MainLayout from "../../layout/paciente/MainLayout";
 import Pendientes from "../../components/pago/Pendientes";

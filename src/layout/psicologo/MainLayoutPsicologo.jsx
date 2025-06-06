@@ -1,3 +1,5 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import Sidebar from "./SidebarPsicologo";
 import HeaderMedico from "./HeaderPsicologo";
 
@@ -16,6 +18,13 @@ const MainLayoutPsicologo = ({ children }) => {
       </div>
     </div>
   );
+};
+
+MainLayoutPsicologo.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.node),
+    PropTypes.node
+  ]).isRequired
 };
 
 export default MainLayoutPsicologo;

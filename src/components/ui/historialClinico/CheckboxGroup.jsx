@@ -8,7 +8,7 @@ export const CheckboxGroup = ({ options, selectedValues, onChange, type }) => (
           type="checkbox"
           checked={selectedValues.includes(option.value)}
           onChange={() => onChange(type, option.value)}
-          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+          className="h-4 w-4 accent-primary-color focus:ring-primary-color border-gray-300 rounded"
         />
         <span className="text-sm text-gray-700">{option.label}</span>
       </label>

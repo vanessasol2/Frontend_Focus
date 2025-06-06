@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types"; // Importa PropTypes
 import { logout } from "../../redux/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -61,5 +62,16 @@ const SidebarLink = ({ to, text, icon, active, expanded }) => {
     </Link>
   );
 };
+
+
+SidebarLink.propTypes = {
+  to: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+  active: PropTypes.bool.isRequired,
+  expanded: PropTypes.bool.isRequired
+};
+
+
 
 export default Sidebar;

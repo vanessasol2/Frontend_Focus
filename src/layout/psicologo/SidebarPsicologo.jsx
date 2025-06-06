@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 import { logout } from "../../redux/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -32,7 +33,7 @@ const Sidebar = () => {
     const routeMappings = {
       '/crear-paciente': '/pacientes',
       '/editar-paciente': '/pacientes',
-      '/historial-paciente': '/historial',
+      '/historial-clinico-paciente': '/historial',
       '/perfil-psicologo': '/perfil',
       '/home-psicologo': '/home-psicologo',
       '/citas-psicologo': '/citas-psicologo',
@@ -78,13 +79,6 @@ const Sidebar = () => {
           expanded={expanded} 
         />
         <SidebarLink 
-          to="/historial" 
-          text="Historial Clínico" 
-          icon={<ScanHeart />} 
-          active={isActive("/historial-psicologo")} 
-          expanded={expanded} 
-        />
-        <SidebarLink 
           to="/comunicacion" 
           text="Comunicación" 
           icon={<MessageSquareText />} 
@@ -121,6 +115,14 @@ const SidebarLink = ({ to, text, icon, active, expanded }) => {
       {expanded && <span className="sidebar__link-text">{text}</span>}
     </Link>
   );
+};
+
+SidebarLink.propTypes = {
+  to: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  icon: PropTypes.element.isRequired,
+  active: PropTypes.bool.isRequired,
+  expanded: PropTypes.bool.isRequired
 };
 
 export default Sidebar;

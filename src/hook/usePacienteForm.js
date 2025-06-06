@@ -1,168 +1,133 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { pacienteCreateService } from "../service/pacienteCreateService";
+import { pacienteMetodoService } from "../service/pacienteMetodoService";
 import { getBackendMessage } from "../utils/errorMessages";
-import { TIPOS_DOCUMENTO } from "../utils/constants"; 
-
-const EXPRESION_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const EXPRESION_TELEFONO = /^\d{10}$/;
-const EXPRESION_CC = /^[0-9]{6,12}$/;
-const EXPRESION_CE = /^[a-zA-Z0-9]{8,11}$/;
-
-const CAMPOS_FORMULARIO = [
-  {
-    nombre: "nombre",
-    etiqueta: "Nombre(s)",
-    tipo: "text",
-    ejemplo: "Ingresa el nombre del paciente",
-    requerido: true,
-    title: "Ingresa el nombre del paciente",
-  },
-  {
-    nombre: "apellido",
-    etiqueta: "Apellido(s)",
-    tipo: "text",
-    ejemplo: "Ingresa el apellido del paciente",
-    requerido: true,
-    title: "Ingresa el apellido del paciente",
-  },
-
-  {
-    nombre: "documento",
-    etiqueta: "Número de Documento",
-    tipo: "text",
-    ejemplo: "Ingresa el número de documento del paciente",
-    requerido: true,
-    title: "Ingresa el número de documento del paciente",
-  },
-  {
-    nombre: "fechaNacimiento",
-    etiqueta: "Fecha de Nacimiento",
-    tipo: "date",
-    requerido: true,
-    title: "Selecciona la fecha de nacimiento",
-  },
-  {
-    nombre: "telefono",
-    etiqueta: "Teléfono",
-    tipo: "tel",
-    ejemplo: "Ingresa el número de teléfono del paciente",
-    requerido: true,
-    title: "Ingresa el número de teléfono",
-  },
-  {
-    nombre: "email",
-    etiqueta: "Correo Electrónico",
-    tipo: "email",
-    ejemplo: "Ingresa un correo electrónico válido del paciente",
-    requerido: true,
-    title: "Ingresa un correo electrónico válido",
-  },
-];
+import { EXPRESIONES_REGEX } from "../utils/constants";
 
 export const usePacienteForm = () => {
   const navegar = useNavigate();
-  const [datosFormulario, setDatosFormulario] = useState(
-    CAMPOS_FORMULARIO.reduce((acc, campo) => {
-      acc[campo.nombre] = "";
-      return acc;
-    }, {})
-  );
+  const [datosFormulario, setDatosFormulario] = useState({
+    nombre: "",
+    apellido: "",
+    documento: "",
+    fechaNacimiento: "",
+    telefono: "",
+    email: "",
+  });
 
   const [errores, setErrores] = useState({});
   const [estaEnviando, setEstaEnviando] = useState(false);
+  const capitalizeLetters = (str) => {
+    return str.replace(/\b([a-zA-Z])/g, (match) => match.toUpperCase());
+  };
 
-  const manejarCambio = useCallback(
-    (e) => {
-      const { name, value } = e.target;
-      setDatosFormulario((prev) => ({ ...prev, [name]: value }));
-      if (errores[name]) setErrores((prev) => ({ ...prev, [name]: "" }));
-    },
-    [errores]
-  );
+  const manejarCambio = (e) => {
+    const { name, value } = e.target;
+    const processedValue =
+      name === "email" ? value.toLowerCase() : capitalizeLetters(value);
+    setDatosFormulario({ ...datosFormulario, [name]: processedValue });
+
+    if (errores[name]) {
+      setErrores((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validarCampo = (nombre, valor) => {
+    if (!valor.trim()) return "Este campo es obligatorio";
+
+    switch (nombre) {
+      case "nombre":
+      case "apellido":
+        if (!EXPRESIONES_REGEX.EXPRESION_SOLO_LETRAS.test(valor)) {
+          return "Solo se permiten letras y espacios";
+        }
+        break;
+
+      case "documento":
+        if (
+          datosFormulario.tipoDoc === "CC" &&
+          !EXPRESIONES_REGEX.CC.test(valor)
+        ) {
+          return "Cédula no válida (10 dígitos)";
+        }
+        break;
+
+      case "telefono":
+        if (!EXPRESIONES_REGEX.TELEFONO.test(valor)) {
+          return "Teléfono no válido. Solo números (10 dígitos)";
+        }
+        break;
+
+      case "email":
+        if (!EXPRESIONES_REGEX.GMAIL.test(valor)) {
+          return "Por favor ingresa un correo de Gmail válido (ej: usuario@gmail.com)";
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return "";
+  };
 
   const validarFormulario = useCallback(() => {
-    const erroresTemporales = {};
+    const nuevosErrores = {};
+    let hayErrores = false;
 
-    CAMPOS_FORMULARIO.forEach((campo) => {
-      if (campo.requerido && !datosFormulario[campo.nombre]?.trim()) {
-        erroresTemporales[campo.nombre] = "Este campo es obligatorio";
+    Object.keys(datosFormulario).forEach((campo) => {
+      const error = validarCampo(campo, datosFormulario[campo]);
+      if (error) {
+        nuevosErrores[campo] = error;
+        hayErrores = true;
       }
     });
 
-    if (datosFormulario.email && !EXPRESION_EMAIL.test(datosFormulario.email)) {
-      erroresTemporales.email = "Correo electrónico no válido";
-    }
-
-    if (
-      datosFormulario.telefono &&
-      !EXPRESION_TELEFONO.test(datosFormulario.telefono.replace(/\D/g, ""))
-    ) {
-      erroresTemporales.telefono = "El teléfono debe tener exactamente 10 dígitos";
-    }
-
-    if (
-      datosFormulario.tipoDoc === "CC" &&
-      !EXPRESION_CC.test(datosFormulario.documento)
-    ) {
-      erroresTemporales.documento = "Cédula no válida (6-12 dígitos)";
-    } else if (
-      datosFormulario.tipoDoc === "CE" &&
-      !EXPRESION_CE.test(datosFormulario.documento)
-    ) {
-      erroresTemporales.documento = "Cédula de extranjería no válida";
-    }
-
-    return erroresTemporales;
+    setErrores(nuevosErrores);
+    return hayErrores;
   }, [datosFormulario]);
 
   const manejarEnvio = async (e) => {
     e.preventDefault();
-    const erroresFormulario = validarFormulario();
 
-    if (Object.keys(erroresFormulario).length > 0) {
-      setErrores(erroresFormulario);
-      toast.error("Por favor completa correctamente todos los campos");
+    if (validarFormulario()) {
+      toast.error("Por favor corrige los errores en el formulario");
       return;
     }
 
     setEstaEnviando(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await pacienteCreateService.registrarPaciente(datosFormulario, token);
+      const response = await pacienteMetodoService.registrarPaciente(
+        datosFormulario,
+        token
+      );
 
-      const successMessage = response.data?.message || "Paciente creado exitosamente";
-      toast.success(successMessage);
-
-      const nuevoPacienteId = response.data.idPaciente;
-
-      if (!nuevoPacienteId) {
-        console.error("No se encontró el ID del paciente en la respuesta");
-        toast.error("Error: No se pudo obtener el ID del paciente creado");
-        return;
-      }
-
-      navegar(`/pacientes/${nuevoPacienteId}/historial`);
+      toast.success("Paciente registrado exitosamente", {
+        duration: 10000,
+        position: "top-center",
+        action: {
+          label: "Cerrar",
+          onClick: () => toast.dismiss(),
+        },
+        dismissible: false,
+      });
+      navegar(`/pacientes/${response.data.idPaciente}/historial`);
     } catch (error) {
       console.error("Error al crear paciente:", error);
-
       const errorMessage = getBackendMessage(error);
 
       if (error.status === 409) {
-        if (errorMessage.toLowerCase().includes("correo")) {
-          setErrores((prev) => ({ ...prev, email: errorMessage }));
-        } else if (errorMessage.toLowerCase().includes("documento")) {
-          setErrores((prev) => ({ ...prev, documento: errorMessage }));
-        }
+        const campo = errorMessage.toLowerCase().includes("correo")
+          ? "email"
+          : errorMessage.toLowerCase().includes("documento")
+          ? "documento"
+          : null;
+        if (campo) setErrores((prev) => ({ ...prev, [campo]: errorMessage }));
       }
 
-      toast.error(errorMessage, {
-        action: {
-          label: "Reintentar",
-          onClick: () => manejarEnvio(e),
-        },
-      });
+      toast.error(errorMessage);
     } finally {
       setEstaEnviando(false);
     }
@@ -174,7 +139,55 @@ export const usePacienteForm = () => {
     estaEnviando,
     manejarCambio,
     manejarEnvio,
-    CAMPOS_FORMULARIO,
+    CAMPOS_FORMULARIO: [
+      {
+        nombre: "nombre",
+        etiqueta: "Nombre(s)",
+        tipo: "text",
+        ejemplo: "Ingresa el nombre del paciente",
+        requerido: true,
+        title: "Ingresa el nombre del paciente (solo letras)",
+      },
+      {
+        nombre: "apellido",
+        etiqueta: "Apellido(s)",
+        tipo: "text",
+        ejemplo: "Ingresa el apellido del paciente",
+        requerido: true,
+        title: "Ingresa el apellido del paciente (solo letras)",
+      },
+      {
+        nombre: "documento",
+        etiqueta: "Número de Documento",
+        tipo: "text",
+        ejemplo: "Ingresa el número de documento del paciente",
+        requerido: true,
+        title: "Ingresa el número de documento del paciente",
+      },
+      {
+        nombre: "fechaNacimiento",
+        etiqueta: "Fecha de Nacimiento",
+        tipo: "date",
+        requerido: true,
+        title: "Selecciona la fecha de nacimiento",
+      },
+      {
+        nombre: "telefono",
+        etiqueta: "Teléfono",
+        tipo: "tel",
+        ejemplo: "Ingresa el número de teléfono del paciente",
+        requerido: true,
+        title: "Ingresa el número de teléfono",
+      },
+      {
+        nombre: "email",
+        etiqueta: "Correo Electrónico",
+        tipo: "email",
+        ejemplo: "Ingresa un correo electrónico válido del paciente",
+        requerido: true,
+        title: "Ingresa un correo electrónico válido",
+      },
+    ],
     navegar,
   };
 };

@@ -1,3 +1,4 @@
+import React from 'react';
 import { CalendarDays, Clock3, CheckCircle, XCircle } from "lucide-react";
 
 const CitaCard = ({ appointment }) => {

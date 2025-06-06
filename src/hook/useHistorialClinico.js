@@ -83,21 +83,24 @@ export const useHistorialClinico = () => {
   }, [pacienteId]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    if (name.startsWith('contactoEmergencia.')) {
-      const field = name.split('.')[1];
-      setHistorial(prev => ({
-        ...prev,
-        contactoEmergencia: {
-          ...prev.contactoEmergencia,
-          [field]: value
-        }
-      }));
-    } else {
-      setHistorial(prev => ({ ...prev, [name]: value }));
-    }
-  };
+  const { name, value } = e.target;
+  
+  if (name.startsWith('contactoEmergencia.')) {
+    const field = name.split('.')[1];
+    setHistorial(prev => ({
+      ...prev,
+      contactoEmergencia: {
+        ...prev.contactoEmergencia,
+        [field]: value
+      }
+    }));
+  } else if (name === 'observacionesGenerales') {
+    const capitalizedValue = value.charAt(0).toUpperCase() + value.slice(1);
+    setHistorial(prev => ({ ...prev, [name]: capitalizedValue }));
+  } else {
+    setHistorial(prev => ({ ...prev, [name]: value }));
+  }
+};
 
   const handleCheckboxChange = (type, value) => {
     setHistorial(prev => {

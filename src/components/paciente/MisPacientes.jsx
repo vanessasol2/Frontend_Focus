@@ -1,31 +1,65 @@
-import React, { useEffect, useState } from "react";
-import { Plus, User } from "lucide-react";
+import React, { useEffect, useState, useMemo } from "react";
+import { Plus, User, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import FiltrosPacientes from "../../components/paciente/FiltrosPacientes";
 import TarjetaPaciente from "../../components/paciente/TarjetaPaciente";
-import { generarPacientesEjemplo } from "../../components/paciente/generarPacientes.js";
+import { getPacientesCard } from "../../service/pacienteMetodoService";
 
 const MisPacientes = () => {
   const [busqueda, setBusqueda] = useState("");
   const [pacientes, setPacientes] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const temporizador = setTimeout(() => {
-      setPacientes(generarPacientesEjemplo(12));
-      setCargando(false);
-    }, 800);
-    return () => clearTimeout(temporizador);
+    const cargarPacientes = async () => {
+      try {
+        console.log("Cargando pacientes...");
+        const data = await getPacientesCard();
+        console.log("Datos recibidos en MisPacientes:", data); 
+        setPacientes(data || []); 
+      } catch (err) {
+        console.error("Error cargando pacientes:", err);
+        setError(err.message || 'Error al cargar los pacientes');
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarPacientes();
   }, []);
 
-  const pacientesFiltrados = pacientes.filter(paciente =>
-    paciente.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    paciente.correo.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  const pacientesFiltrados = useMemo(() => {
+    if (!busqueda) return pacientes;
+    return pacientes.filter(paciente =>
+      paciente.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
+      paciente.correo?.toLowerCase().includes(busqueda.toLowerCase())
+    );
+  }, [pacientes, busqueda]);
+
+  const hayResultados = pacientesFiltrados.length > 0;
+  const hayPacientes = pacientes.length > 0;
+
+  if (error) {
+    return (
+      <div className="mt-7 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+        <div className="flex items-center gap-2 text-red-700">
+          <AlertCircle size={20} />
+          <h3 className="font-medium">Error al cargar pacientes</h3>
+        </div>
+        <p className="mt-2 text-sm text-red-600">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200"
+        >
+          Reintentar
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className=" mt-7">
-      
+    <div className="mt-7">
       <FiltrosPacientes 
         valorBusqueda={busqueda} 
         onChangeBusqueda={(e) => setBusqueda(e.target.value)} 
@@ -46,31 +80,39 @@ const MisPacientes = () => {
             </div>
           ))}
         </div>
-      ) : pacientesFiltrados.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {pacientesFiltrados.map((paciente) => (
-            <TarjetaPaciente key={paciente.id} paciente={paciente} />
-          ))}
-        </div>
       ) : (
-        <div className="text-center py-12">
-          <div className="mx-auto w-24 h-24 bg-violet-50 rounded-full flex items-center justify-center mb-4">
-            <User className="text-violet-400" size={32} />
-          </div>
-          <h3 className="text-lg font-medium text-gray-700">No se encontraron pacientes</h3>
-          <p className="text-gray-500 mt-1">
-            {busqueda 
-              ? `No hay resultados para "${busqueda}"`
-              : "No hay pacientes registrados"}
-          </p>
-          <Link 
-            to="/crear-paciente" 
-            className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-primary-color hover:bg-secundary-color focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
-          >
-            <Plus size={16} className="mr-1" />
-            Agregar nuevo paciente
-          </Link>
-        </div>
+        <>
+          {hayResultados ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {pacientesFiltrados.map((paciente) => (
+                <TarjetaPaciente key={paciente.id} paciente={paciente} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="mx-auto w-24 h-24 bg-violet-50 rounded-full flex items-center justify-center mb-4">
+                <User className="text-violet-400" size={32} />
+              </div>
+              <h3 className="text-lg font-medium text-gray-700">
+                {hayPacientes 
+                  ? `No hay resultados para "${busqueda}"`
+                  : "No hay pacientes registrados"}
+              </h3>
+              <p className="text-gray-500 mt-1">
+                {hayPacientes 
+                  ? "Prueba con otros términos de búsqueda"
+                  : "Comienza agregando tu primer paciente"}
+              </p>
+              <Link 
+                to="/crear-paciente" 
+                className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full shadow-sm text-white bg-primary-color hover:bg-secundary-color focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+              >
+                <Plus size={16} className="mr-1" />
+                Agregar nuevo paciente
+              </Link>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

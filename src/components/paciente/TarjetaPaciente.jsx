@@ -50,11 +50,12 @@ const calculateProgress = (paciente) => {
 };
 
 const TarjetaPaciente = ({ paciente }) => {
+
   const normalizedPaciente = {
     id: paciente.id,
     nombrePaciente: paciente.nombre || paciente.nombrePaciente || 'Sin nombre',
     email: paciente.correo || paciente.email || 'Sin email',
-    estado: paciente.estado === 'activo',
+    estado: Boolean(paciente.estado),
     telefono: paciente.telefono || '',
     fechaCreacionHistorial: paciente.ultimaVisita || paciente.fechaCreacionHistorial,
     sesionesCompletadas: paciente.sesionesCompletadas || 0,
@@ -84,9 +85,10 @@ const TarjetaPaciente = ({ paciente }) => {
           </p>
         </div>
         <div
-          className={`w-3 h-3 rounded-full ${estado === ESTADOS.ACTIVO ? 'bg-green-500' : 'bg-gray-400'}`}
-          title={estado === ESTADOS.ACTIVO ? 'Activo' : 'Inactivo'}
+          className={`w-3 h-3 rounded-full ${normalizedPaciente.estado ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}
+          title={normalizedPaciente.estado ? 'Activo' : 'Inactivo'}
         />
+
       </div>
 
       {/* Barra de progreso */}
@@ -117,20 +119,11 @@ const TarjetaPaciente = ({ paciente }) => {
         )}
       </div>
 
-      <div className="flex justify-between items-center mb-2">
-        <span
-          className={`text-[0.7rem] sm:text-xs font-semibold px-3 py-1 rounded-full shadow-sm border whitespace-nowrap ${normalizedPaciente.tieneCitasPendientes
-              ? 'bg-amber-50 text-amber-700 border-amber-200'
-              : 'bg-gray-100 text-gray-700 border-gray-200'
-            }`}
-        >
-          {normalizedPaciente.tieneCitasPendientes ? 'Citas pendientes' : 'Sin citas pendientes'}
-        </span>
-      </div>
+
 
       <div className="flex items-center gap-2 text-xs text-gray-600 mb-2">
         <h1>Creación: </h1>
-        <Phone size={12} />
+        <Calendar size={12} />
         {formatDate(normalizedPaciente.fechaCreacionHistorial)}
       </div>
 
@@ -139,6 +132,15 @@ const TarjetaPaciente = ({ paciente }) => {
         <Phone size={12} />
         <span>{telefono}</span>
       </div>
+
+      <span
+        className={`inline-block text-center  text-[0.7rem] sm:text-xs font-semibold px-3 py-1 rounded-full shadow-sm border whitespace-nowrap mb-2 ${normalizedPaciente.tieneCitasPendientes
+          ? 'bg-amber-50 text-amber-700 border-amber-200'
+          : 'bg-gray-100 text-gray-700 border-gray-200'
+          }`}
+      >
+        {normalizedPaciente.tieneCitasPendientes ? 'Citas pendientes' : 'Sin citas pendientes'}
+      </span>
 
       <div className="flex justify-between border-t pt-3">
         <Link

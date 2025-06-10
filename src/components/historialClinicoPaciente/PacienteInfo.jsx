@@ -79,7 +79,7 @@ const PacienteInfo = () => {
   );
 
   return (
-    <div className="content-bg rounded-xl overflow-hidden mt-7">
+    <div className="rounded-xl overflow-hidden mt-7">
       {/* Header del paciente */}
       <div className="bg-button-primary p-2 text-white w-full max-w-4xl mx-auto ">
         <div className="flex flex-col items-center sm:flex-row sm:items-start sm:space-x-3">
@@ -90,7 +90,11 @@ const PacienteInfo = () => {
                 <User className="w-8 h-8 text-primary-color" />
               </div>
             </div>
-            <span className="absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 border-white"></span>
+            <span
+              className={`absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 rounded-full ${pacienteInfo.estado ? 'bg-green-500' : 'bg-gray-400'
+                }`}
+              title={pacienteInfo.estado ? 'Activo' : 'Inactivo'}
+            ></span>
           </div>
 
           {/* Información principal */}
@@ -149,9 +153,13 @@ const PacienteInfo = () => {
               </li>
               <li>
                 <p className="text-xs text-gray-500 font-medium tracking-wider">Estado</p>
-                <p className="text-sm font-semibold mt-1 text-green-700 flex items-center">
-                  <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                  {pacienteInfo.estado ? 'Activo' : 'Inactivo'}
+                <p className="text-sm font-semibold mt-1 flex items-center">
+                  <span
+                    className={`w-2 h-2 rounded-full mr-2 ${pacienteInfo.estado ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}
+                  ></span>
+                  <span className={pacienteInfo.estado ? 'text-green-700' : 'text-gray-600'}>
+                    {pacienteInfo.estado ? 'Activo' : 'Inactivo'}
+                  </span>
                 </p>
               </li>
             </ul>

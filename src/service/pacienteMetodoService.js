@@ -89,7 +89,7 @@ const transformarPaciente = (paciente, index) => {
     id: paciente.id || `temp-${index}-${Date.now()}`,
     nombre: paciente.nombrePaciente || `Paciente ${index + 1}`,
     correo: paciente.email || '',
-    estado: paciente.estado === true ? 'inactivo' : 'activo', 
+    estado: paciente.estado,
     progreso: Math.min(100, Math.max(0, Number(paciente.porcentajeTerapia) || 0)), 
     sesionesTotales: Math.max(0, Number(paciente.sesionesTotales) || 0),
     sesionesCompletadas: Math.max(0, Number(paciente.sesionesCompletadas) || 0),
@@ -124,4 +124,14 @@ const formatTelefono = (telefono) => {
   return telString.length > 6 
     ? `${telString.slice(0, 3)}-${telString.slice(3, 6)}-${telString.slice(6)}` 
     : telString;
+};
+
+export const buscarPacientes = async (termino) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`paciente/buscarPaciente?busqueda=${encodeURIComponent(termino)}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 };

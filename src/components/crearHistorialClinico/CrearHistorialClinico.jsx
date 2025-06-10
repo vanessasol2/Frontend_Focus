@@ -147,6 +147,9 @@ const CrearHistorialClinico = () => {
                     <h3 className="text-base font-semibold text-gray-800 mb-3 flex items-center">
                       Medicamentos que toma actualmente
                     </h3>
+                    <p className="text-sm text-gray-600 max-w-2xl mb-5">
+                      Seleccione un solo medicamento
+                    </p>
 
                     <CheckboxGroup
                       options={MEDICAMENTOS_OPTIONS}

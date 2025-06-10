@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { logout } from "../../redux/slices/AuthSlice";
 import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { HomeIcon, BriefcaseMedical, MessageSquareText, ScanHeart, LogOut, ChevronLast, ChevronFirst, Users, User } from "lucide-react";
+import { HomeIcon, BriefcaseMedical, LogOut, ChevronLast, ChevronFirst, Users, User } from "lucide-react";
 import "../style/Sidebar.css";
 
 const Sidebar = () => {
@@ -59,7 +59,7 @@ const Sidebar = () => {
       <nav className="sidebar__nav">
         <SidebarLink 
           to="/home-psicologo" 
-          text="Dashboard" 
+          text="Inicio" 
           icon={<HomeIcon />} 
           active={isActive("/home-psicologo", true)} 
           expanded={expanded} 
@@ -79,13 +79,6 @@ const Sidebar = () => {
           expanded={expanded} 
         />
         <SidebarLink 
-          to="/comunicacion" 
-          text="Comunicación" 
-          icon={<MessageSquareText />} 
-          active={isActive("/comunicacion-psicolgo", true)} 
-          expanded={expanded} 
-        />
-        <SidebarLink 
           to="/perfil-psicologo" 
           text="Perfil" 
           icon={<User />} 
@@ -97,7 +90,7 @@ const Sidebar = () => {
       <div className="sidebar__logout">
         <button onClick={handleLogout} className="logout-button">
           <LogOut className="logout-icon" />
-          {expanded && <span className="logout-text">Sign out</span>}
+          {expanded && <span className="logout-text">Cerrar Sesión</span>}
         </button>
       </div>
     </aside>

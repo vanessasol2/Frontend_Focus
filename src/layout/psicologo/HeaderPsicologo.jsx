@@ -2,21 +2,13 @@ import React from 'react';
 import { useLocation, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Notificaciones from "../../components/header/Notifications";
+import Perfil from '../../components/header/perfil';
 import "../style/Header.css";
 
 const HeaderPsicologo = () => {
   const location = useLocation();
-  const { user, role } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth);
   const userName = user?.name || "Invitado";
-  const userRole = user?.roles?.[0] || role || "Usuario";
-
-  const roleNames = {
-    PSICOLOGO: "Psicólogo",
-    ADMIN: "Administrador",
-    PACIENTE: "Paciente"
-  };
-  const displayRole = roleNames[userRole] || userRole;
-
   const routeNames = {
     "/home-psicologo": `Bienvenido, ${userName}`,
     "/citas-psicologo": "Citas",
@@ -109,10 +101,8 @@ const HeaderPsicologo = () => {
           </nav>
         </div>
         <div className="user-info">
-          <span className="user-role with-icon">
-            {displayRole}
-          </span>
           <Notificaciones />
+          <Perfil/>
         </div>
       </div>
     </header>

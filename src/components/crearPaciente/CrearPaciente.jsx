@@ -69,7 +69,7 @@ const CrearPaciente = () => {
         position="top-center"
         toastOptions={{
           style: { fontFamily: 'inherit', fontSize: '0.875rem' },
-          duration: 5000
+          duration: 10000
         }}
       />
 

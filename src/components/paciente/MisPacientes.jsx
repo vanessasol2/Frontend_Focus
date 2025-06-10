@@ -7,7 +7,7 @@ import { getPacientesCard } from "../../service/pacienteMetodoService";
 
 const MisPacientes = () => {
   const [busqueda, setBusqueda] = useState("");
-  const [pacientes, setPacientes] = useState([]);
+  const [pacientes, setPacientes] = useState([]); 
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
@@ -16,11 +16,15 @@ const MisPacientes = () => {
       try {
         console.log("Cargando pacientes...");
         const data = await getPacientesCard();
-        console.log("Datos recibidos en MisPacientes:", data); 
-        setPacientes(data || []); 
+        console.log("Datos recibidos:", data);
+        
+        const pacientesData = Array.isArray(data) ? data : [];
+        setPacientes(pacientesData);
+        
       } catch (err) {
         console.error("Error cargando pacientes:", err);
         setError(err.message || 'Error al cargar los pacientes');
+        setPacientes([]); 
       } finally {
         setCargando(false);
       }
@@ -29,12 +33,18 @@ const MisPacientes = () => {
     cargarPacientes();
   }, []);
 
+
   const pacientesFiltrados = useMemo(() => {
-    if (!busqueda) return pacientes;
-    return pacientes.filter(paciente =>
-      paciente.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
-      paciente.correo?.toLowerCase().includes(busqueda.toLowerCase())
-    );
+    if (!Array.isArray(pacientes)) return []; 
+    
+    return busqueda
+      ? pacientes.filter(paciente => {
+          const nombre = paciente.nombre?.toLowerCase() || '';
+          const correo = paciente.correo?.toLowerCase() || '';
+          return nombre.includes(busqueda.toLowerCase()) || 
+                 correo.includes(busqueda.toLowerCase());
+        })
+      : pacientes;
   }, [pacientes, busqueda]);
 
   const hayResultados = pacientesFiltrados.length > 0;
@@ -85,7 +95,10 @@ const MisPacientes = () => {
           {hayResultados ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {pacientesFiltrados.map((paciente) => (
-                <TarjetaPaciente key={paciente.id} paciente={paciente} />
+                <TarjetaPaciente 
+                  key={paciente.id || Math.random()} 
+                  paciente={paciente} 
+                />
               ))}
             </div>
           ) : (

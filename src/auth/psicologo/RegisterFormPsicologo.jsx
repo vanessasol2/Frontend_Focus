@@ -1,6 +1,6 @@
 import React from "react";
 import { User, Mail, Lock,FileUser, BriefcaseBusiness, BookUser, File, FileText } from "lucide-react";
-import { Toaster } from "sonner";
+import { Toaster, toast } from "sonner";
 import ImageSection from '../../components/ui/ImageSection/Imagen';
 import agendar1 from "../../img/agendar1.jpeg";
 import { InputField } from "../../components/ui/InputField";

@@ -1,30 +1,49 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Plus, User, AlertCircle } from "lucide-react";
+import { Plus, User, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import FiltrosPacientes from "../../components/paciente/FiltrosPacientes";
 import TarjetaPaciente from "../../components/paciente/TarjetaPaciente";
-import { getPacientesCard } from "../../service/pacienteMetodoService";
+import { getPacientesPaginados } from "../../service/pacienteMetodoService";
 
 const MisPacientes = () => {
   const [busqueda, setBusqueda] = useState("");
-  const [pacientes, setPacientes] = useState([]); 
+  const [data, setData] = useState({
+    pacientes: [],
+    paginacion: {
+      totalPages: 0,
+      totalElements: 0,
+      currentPage: 0,
+      pageSize: 10,
+      isFirst: true,
+      isLast: true
+    }
+  });
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const cargarPacientes = async () => {
       try {
-        console.log("Cargando pacientes...");
-        const data = await getPacientesCard();
-        console.log("Datos recibidos:", data);
-        
-        const pacientesData = Array.isArray(data) ? data : [];
-        setPacientes(pacientesData);
-        
+        setCargando(true);
+        const response = await getPacientesPaginados();
+        setData({
+          pacientes: response.pacientes,
+          paginacion: response.paginacion
+        });
       } catch (err) {
         console.error("Error cargando pacientes:", err);
         setError(err.message || 'Error al cargar los pacientes');
-        setPacientes([]); 
+        setData({
+          pacientes: [],
+          paginacion: {
+            totalPages: 0,
+            totalElements: 0,
+            currentPage: 0,
+            pageSize: 10,
+            isFirst: true,
+            isLast: true
+          }
+        });
       } finally {
         setCargando(false);
       }
@@ -33,22 +52,37 @@ const MisPacientes = () => {
     cargarPacientes();
   }, []);
 
+  const handlePageChange = async (newPage) => {
+    try {
+      setCargando(true);
+      const response = await getPacientesPaginados(newPage);
+      setData({
+        pacientes: response.pacientes,
+        paginacion: response.paginacion
+      });
+    } catch (err) {
+      console.error("Error cambiando página:", err);
+      setError(err.message || 'Error al cambiar de página');
+    } finally {
+      setCargando(false);
+    }
+  };
 
   const pacientesFiltrados = useMemo(() => {
-    if (!Array.isArray(pacientes)) return []; 
+    if (!Array.isArray(data.pacientes)) return [];
     
     return busqueda
-      ? pacientes.filter(paciente => {
-          const nombre = paciente.nombre?.toLowerCase() || '';
-          const correo = paciente.correo?.toLowerCase() || '';
+      ? data.pacientes.filter(paciente => {
+          const nombre = paciente.nombrePaciente?.toLowerCase() || '';
+          const correo = paciente.email?.toLowerCase() || '';
           return nombre.includes(busqueda.toLowerCase()) || 
                  correo.includes(busqueda.toLowerCase());
         })
-      : pacientes;
-  }, [pacientes, busqueda]);
+      : data.pacientes;
+  }, [data.pacientes, busqueda]);
 
   const hayResultados = pacientesFiltrados.length > 0;
-  const hayPacientes = pacientes.length > 0;
+  const hayPacientes = data.paginacion.totalElements > 0;
 
   if (error) {
     return (
@@ -93,14 +127,45 @@ const MisPacientes = () => {
       ) : (
         <>
           {hayResultados ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {pacientesFiltrados.map((paciente) => (
-                <TarjetaPaciente 
-                  key={paciente.id || Math.random()} 
-                  paciente={paciente} 
-                />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {pacientesFiltrados.map((paciente) => (
+                  <TarjetaPaciente 
+                    key={paciente.id} 
+                    paciente={paciente} 
+                  />
+                ))}
+              </div>
+              
+              {/* Paginación */}
+              <div className="flex items-center justify-between mt-6">
+                <div className="text-sm text-gray-500">
+                  Mostrando {data.pacientes.length} de {data.paginacion.totalElements} pacientes
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handlePageChange(data.paginacion.currentPage - 1)}
+                    disabled={data.paginacion.isFirst}
+                    className={`p-2 rounded-md border ${data.paginacion.isFirst ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-primary-color hover:bg-gray-50'}`}
+                  >
+                    <ChevronLeft size={18} />
+                  </button>
+                  
+                  <span className="px-3 py-1 bg-white text-sm">
+                    Página {data.paginacion.currentPage + 1} de {data.paginacion.totalPages}
+                  </span>
+                  
+                  <button
+                    onClick={() => handlePageChange(data.paginacion.currentPage + 1)}
+                    disabled={data.paginacion.isLast}
+                    className={`p-2 rounded-md border ${data.paginacion.isLast ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-primary-color hover:bg-gray-50'}`}
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </div>
+              </div>
+            </>
           ) : (
             <div className="text-center py-12">
               <div className="mx-auto w-24 h-24 bg-violet-50 rounded-full flex items-center justify-center mb-4">

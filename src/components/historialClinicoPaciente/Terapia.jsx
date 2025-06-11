@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PlusIcon } from 'lucide-react';
+import { getTerapia } from "../../service/terapiaService";
 import ModalNuevaTerapia from './ModalNuevaTerapia';
 
 const Terapia = ({ 
-  terapiaPrincipal, 
+  pacienteId,
   compact, 
   onShowModal, 
   handleCrearTerapia,
   showModal 
 }) => {
+
+  const [terapias, setTerapias] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const tipoTerapiaMap = {
     familiar: "Terapia Familiar",
     grupal: "Terapia Grupal",
@@ -32,9 +38,27 @@ const Terapia = ({
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
 
+  useEffect(() => {
+    const fetchTerapias = async () => {
+      if (!pacienteId) return;
+
+      try {
+        setLoading(true);
+        const data = await getTerapia(pacienteId);
+        setTerapias(Array.isArray(data) ? data : []);
+      } catch (err) {
+        setError("Error al cargar las terapias");
+        console.error("Error fetching terapias:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTerapias();
+  }, [pacienteId]);
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      {/* Encabezado */}
       <div className={`px-4 ${compact ? 'py-3' : 'py-4'} border-b border-gray-100 bg-gray-50 flex justify-between items-center`}>
         <h2 className={`${compact ? 'text-base' : 'text-lg'} font-semibold text-gray-900`}>Terapias</h2>
         <button
@@ -46,58 +70,58 @@ const Terapia = ({
         </button>
       </div>
 
-      {/* Contenido */}
       <div className={`${compact ? 'p-4' : 'p-6'}`}>
-        {/* Terapia principal */}
-        {terapiaPrincipal && (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h3 className={`${compact ? 'text-sm' : 'text-base'} font-semibold text-gray-800`}>
-                {compact ? 'Terapia' : 'Terapia Principal'}
-              </h3>
-              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(terapiaPrincipal.estado).bg} ${getStatusColor(terapiaPrincipal.estado).text}`}>
-                {compact ? terapiaPrincipal.estado.substring(0, 3) : terapiaPrincipal.estado}
-              </span>
-            </div>
+        {loading && <p className="text-gray-500">Cargando terapias...</p>}
+        {error && <p className="text-red-600">{error}</p>}
 
-            <div className={`bg-gray-50 rounded-lg ${compact ? 'p-2' : 'p-4'} border border-gray-200`}>
-              <div className={`grid ${compact ? 'grid-cols-2 gap-2' : 'grid-cols-1 md:grid-cols-4 gap-4'}`}>
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</p>
-                  <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-900`}>
-                    {terapiaPrincipal.descripcion}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Período</p>
-                  <div className={`flex flex-col ${compact ? 'text-xs' : 'text-sm'} text-gray-900 font-medium space-y-0.5`}>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">Inicio:</span>
-                      <span>{formatDate(terapiaPrincipal.fechaInicio)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-500">Fin:</span>
-                      <span>{formatDate(terapiaPrincipal.fechaFin)}</span>
+        {!loading && !error && (
+          terapias.length === 0 ? (
+            <p className="text-gray-500">No hay terapias registradas</p>
+          ) : (
+            <div className="space-y-4">
+              {terapias.map((terapia) => (
+                <div key={terapia.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className={`${compact ? 'text-sm' : 'text-base'} font-semibold text-gray-800`}>
+                      {terapia.descripcion || 'Terapia sin nombre'}
+                    </h3>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(terapia.estado).bg} ${getStatusColor(terapia.estado).text}`}>
+                      {compact ? terapia.estado?.substring(0, 3) : terapia.estado}
+                    </span>
+                  </div>
+
+                  <div className={`bg-gray-50 rounded-lg ${compact ? 'p-2' : 'p-4'} border border-gray-200`}>
+                    <div className={`grid ${compact ? 'grid-cols-2 gap-2' : 'grid-cols-1 md:grid-cols-4 gap-4'}`}>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</p>
+                        <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-900`}>
+                          {tipoTerapiaMap[terapia.tipoTerapia?.toLowerCase()] || "No especificado"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Sesiones</p>
+                        <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-900`}>
+                          {terapia.numeroSesiones || 'N/A'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Inicio</p>
+                        <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-900`}>
+                          {formatDate(terapia.fechaInicio)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Fin</p>
+                        <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-900`}>
+                          {formatDate(terapia.fechaFin)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</p>
-                  <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-900`}>
-                    {tipoTerapiaMap[terapiaPrincipal.tipoTerapia?.toLowerCase()] || "No especificado"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {compact ? 'Ses.' : 'Sesiones'}
-                  </p>
-                  <p className={`${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-900`}>
-                    {terapiaPrincipal.numeroSesiones}
-                  </p>
-                </div>
-              </div>
+              ))}
             </div>
-          </div>
+          )
         )}
 
         <ModalNuevaTerapia

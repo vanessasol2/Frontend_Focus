@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 
 const useTerapiaState = (pacienteId) => {
-  // Cargar estado inicial desde localStorage
   const loadState = () => {
     try {
       const saved = localStorage.getItem(`terapia-${pacienteId}`);
       return saved ? JSON.parse(saved) : {
+        allTerapias: [],       
         terapiaPrincipal: null,
         sesiones: []
       };
     } catch (error) {
       console.error("Error al cargar terapia:", error);
       return {
+        allTerapias: [],
         terapiaPrincipal: null,
         sesiones: []
       };
@@ -20,12 +21,17 @@ const useTerapiaState = (pacienteId) => {
 
   const [terapiaState, setTerapiaState] = useState(loadState);
 
-  // Persistir cambios en localStorage
   useEffect(() => {
     localStorage.setItem(`terapia-${pacienteId}`, JSON.stringify(terapiaState));
   }, [pacienteId, terapiaState]);
 
-  // Métodos para actualizar el estado
+  const setAllTerapias = (terapias) => {
+    setTerapiaState(prev => ({
+      ...prev,
+      allTerapias: Array.isArray(terapias) ? terapias : []
+    }));
+  };
+
   const setTerapiaPrincipal = (terapia) => {
     setTerapiaState(prev => ({
       ...prev,
@@ -36,7 +42,7 @@ const useTerapiaState = (pacienteId) => {
   const setSesiones = (sesiones) => {
     setTerapiaState(prev => ({
       ...prev,
-      sesiones
+      sesiones: Array.isArray(sesiones) ? sesiones : []
     }));
   };
 
@@ -47,11 +53,20 @@ const useTerapiaState = (pacienteId) => {
     }));
   };
 
+  const addTerapia = (nuevaTerapia) => {
+    setTerapiaState(prev => ({
+      ...prev,
+      allTerapias: [...prev.allTerapias, nuevaTerapia]
+    }));
+  };
+
   return {
     terapiaData: terapiaState,
+    setAllTerapias,
     setTerapiaPrincipal,
     setSesiones,
-    addSesion
+    addSesion,
+    addTerapia
   };
 };
 

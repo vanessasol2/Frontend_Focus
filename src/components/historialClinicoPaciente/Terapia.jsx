@@ -18,20 +18,26 @@ const Terapia = ({
     infantil: "Terapia Infantil"
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      'En progreso': { bg: 'bg-blue-100', text: 'text-blue-800' },
-      'Completada': { bg: 'bg-green-100', text: 'text-green-800' },
-      'Cancelada': { bg: 'bg-red-100', text: 'text-red-800' }
-    };
-    return colors[status] || { bg: 'bg-gray-100', text: 'text-gray-800' };
+const getStatusColor = (status) => {
+  if (!status) return { bg: 'bg-gray-100', text: 'text-gray-800' }; 
+  
+  const normalizedStatus = status.toLowerCase().replace(/_/g, ' ').trim();
+
+  const colors = {
+    'en progreso': { bg: 'bg-blue-100', text: 'text-blue-800' },
+    'completada': { bg: 'bg-green-100', text: 'text-green-800' },
+    'cancelada': { bg: 'bg-red-100', text: 'text-red-800' },
   };
+
+  return colors[normalizedStatus] || { bg: 'bg-gray-100', text: 'text-gray-800' };
+};
 
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('es-ES', options);
   };
+
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">

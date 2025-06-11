@@ -6,7 +6,17 @@ export const crearSesion = async (sesionData) => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   try {
-    const response = await axios.post(`${API_URL}/sesion/psicologo`, sesionData, {
+    const payload = {
+      fechaSesion: sesionData.fechaSesion,
+      horaInicio: sesionData.horaInicio,
+      horaFin: sesionData.horaFin,
+      nombre: sesionData.nombre,
+      notasAdicionales: sesionData.notasAdicionales,
+      idTerapia: sesionData.idTerapia,      
+      idPaciente: sesionData.idPaciente     
+    };
+
+    const response = await axios.post(`${API_URL}/sesion/psicologo`, payload, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -19,7 +29,7 @@ export const crearSesion = async (sesionData) => {
   }
 };
 
-export const traerSesiones = async () => {
+export const traerSesiones = async (pacienteId) => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   try {
@@ -37,10 +47,11 @@ export const traerSesiones = async () => {
 };
 
 
-export const crearTerapia = async (terapiaData) => {
-const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
-  const response = await axios.post(`${API_URL}/terapia/crear`, terapiaData, {
+export const crearTerapia = async (idPaciente, terapiaData) => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  const response = await axios.post(`${API_URL}/terapia/crear/${idPaciente}`, terapiaData, {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -48,6 +59,7 @@ const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   return response.data;
 };
+
 
 export const getTerapia = async (pacienteId) => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -60,8 +72,6 @@ export const getTerapia = async (pacienteId) => {
       }
     });
 
-    console.log("Datos terapia recibidos:", response.data);
-    console.log("Sesiones:", response.data.sesiones);
 
     return response.data;
   } catch (error) {

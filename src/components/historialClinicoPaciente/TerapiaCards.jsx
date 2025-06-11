@@ -15,25 +15,25 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
     setAllTerapias 
   } = useTerapiaState(pacienteId);
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState({ terapias: true, sesiones: true });
   const [error, setError] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modals, setModals] = useState({
+    sesion: false,
+    terapia: false
+  });
   const [terapiaSeleccionada, setTerapiaSeleccionada] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [showTerapiaModal, setShowTerapiaModal] = useState(false);
   const navigate = useNavigate();
 
-  const [sesiones, setLocalSesiones] = useState([]); 
-
+  // Cargar datos iniciales
   useEffect(() => {
     const cargarDatos = async () => {
       try {
-        setLoading(true);
+        setLoading(prev => ({ ...prev, terapias: true }));
         setError(null);
 
+        // 1. Cargar terapias
         const terapias = await getTerapia(pacienteId);
-        console.log('Terapias recibidas:', terapias); 
-
+        
         if (!terapias || !Array.isArray(terapias)) {
           throw new Error('Formato de datos inválido');
         }
@@ -43,79 +43,96 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
         if (terapias.length > 0) {
           const terapiaPrincipal = terapias[0];
           setTerapiaPrincipal(terapiaPrincipal);
-          setTerapiaSeleccionada(terapiaPrincipal); 
-
-          const sesiones = await traerSesiones({ terapiaId: terapiaPrincipal.id });
-          setSesiones(sesiones);
-          setLocalSesiones(sesiones);
-        } else {
-          setTerapiaPrincipal(null);
-          setSesiones([]);
-          setLocalSesiones([]);
+          setTerapiaSeleccionada(terapiaPrincipal);
+          
+          // 2. Cargar sesiones para la terapia principal
+          await cargarSesiones(terapiaPrincipal.id);
         }
       } catch (err) {
         console.error('Error al cargar datos:', err);
         setError(err.message || 'Error al cargar los datos');
       } finally {
-        setLoading(false);
+        setLoading(prev => ({ ...prev, terapias: false }));
       }
     };
 
     if (pacienteId) cargarDatos();
   }, [pacienteId]);
 
-  const handleCrearTerapia = async (terapiaData) => {
-  try {
-    const terapiaCompleta = {
-      ...terapiaData,
-      idPaciente: pacienteId,
-      estado: 'En progreso'
-    };
-
-    const terapiaCreada = await crearTerapia(terapiaCompleta);
-    
-    addTerapia(terapiaCreada);
-    setTerapiaPrincipal(terapiaCreada);
-    setTerapiaSeleccionada(terapiaCreada);
-
-    const nuevasSesiones = await traerSesiones({ terapiaId: terapiaCreada.id });
-    setSesiones(nuevasSesiones);
-    setLocalSesiones(nuevasSesiones);
-
-    setShowTerapiaModal(false);
-    setError(null);
-  } catch (err) {
-    console.error('Error al crear terapia:', err);
-    setError(err.response?.data?.message || err.message || 'Error al crear la terapia');
-  }
-};
-
-
-  const abrirModal = () => {
-    setModalOpen(true);
-  };
-
-  const cerrarModal = () => {
-    setModalOpen(false);
-  };
-
-  const manejarNuevaSesion = async (nuevaSesion) => {
+  // Función para cargar sesiones
+  const cargarSesiones = async (terapiaId) => {
     try {
-      const sesionConTerapia = {
-        ...nuevaSesion,
-        terapiaId: terapiaSeleccionada.id, 
-      };
-
-      const sesionCreada = await crearSesion(sesionConTerapia)
-      setLocalSesiones(prev => [...prev, sesionCreada]); 
-      cerrarModal();
-    } catch (error) {
-      console.error('Error al crear la sesión:', error);
+      setLoading(prev => ({ ...prev, sesiones: true }));
+      const sesionesData = await traerSesiones({ terapiaId });
+      setSesiones(sesionesData);
+    } catch (err) {
+      console.error('Error al cargar sesiones:', err);
+      setError(err.message || 'Error al cargar las sesiones');
+    } finally {
+      setLoading(prev => ({ ...prev, sesiones: false }));
     }
   };
 
-  if (loading) {
-    return <div className="loading-spinner">Cargando...</div>;
+  // Manejar cambio de terapia seleccionada
+  const handleSelectTerapia = async (terapia) => {
+    setTerapiaPrincipal(terapia);
+    setTerapiaSeleccionada(terapia);
+    await cargarSesiones(terapia.id);
+  };
+
+  // Crear nueva terapia
+  const handleCrearTerapia = async (terapiaData) => {
+    try {
+      const terapiaCompleta = {
+        ...terapiaData,
+        idPaciente: pacienteId,
+        estado: 'En progreso'
+      };
+
+      const terapiaCreada = await crearTerapia(terapiaCompleta);
+      addTerapia(terapiaCreada);
+      setTerapiaPrincipal(terapiaCreada);
+      setTerapiaSeleccionada(terapiaCreada);
+      
+      // Cargar sesiones para la nueva terapia
+      await cargarSesiones(terapiaCreada.id);
+      
+      setModals(prev => ({ ...prev, terapia: false }));
+      setError(null);
+    } catch (err) {
+      console.error('Error al crear terapia:', err);
+      setError(err.response?.data?.message || err.message || 'Error al crear la terapia');
+    }
+  };
+
+  // Crear nueva sesión
+  const manejarNuevaSesion = async (nuevaSesion) => {
+    try {
+      if (!terapiaSeleccionada) {
+        throw new Error('No hay terapia seleccionada');
+      }
+
+      const sesionConTerapia = {
+        ...nuevaSesion,
+        terapiaId: terapiaSeleccionada.id,
+      };
+
+      const sesionCreada = await crearSesion(sesionConTerapia);
+      addSesion(sesionCreada);
+      setModals(prev => ({ ...prev, sesion: false }));
+    } catch (error) {
+      console.error('Error al crear la sesión:', error);
+      setError(error.message || 'Error al crear la sesión');
+    }
+  };
+
+  // Control de modales
+  const toggleModal = (modalName, isOpen) => {
+    setModals(prev => ({ ...prev, [modalName]: isOpen }));
+  };
+
+  if (loading.terapias) {
+    return <div className="loading-spinner">Cargando terapias...</div>;
   }
 
   if (error) {
@@ -123,33 +140,33 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
   }
 
   return (
-    <>
+    <div className="terapia-sesion-container">
       <Terapia
-        pacienteId={pacienteId}  
+        pacienteId={pacienteId}
         terapias={pacienteTerapias.allTerapias || []}
         terapiaPrincipal={pacienteTerapias.terapiaPrincipal}
         compact={compact}
-        onShowModal={() => setShowTerapiaModal(true)}
+        onShowModal={() => toggleModal('terapia', true)}
         handleCrearTerapia={handleCrearTerapia}
-        onClose={() => setShowModal(false)}
-         showModal={showTerapiaModal}
-        onSelectTerapia={(terapia) => {
-          setTerapiaPrincipal(terapia);
-          setTerapiaSeleccionada(terapia);
-        }}
+        onClose={() => toggleModal('terapia', false)}
+        showModal={modals.terapia}
+        onSelectTerapia={handleSelectTerapia}
       />
 
-      <Sesiones
-        sesiones={sesiones}
-        terapiaPrincipal={terapiaSeleccionada}
-        compact={false}
-        onCrearSesion={abrirModal} 
-        modalOpen={modalOpen}
-        onCloseModal={cerrarModal}
-        terapiaSeleccionada={terapiaSeleccionada}
-        onManejarNuevaSesion={manejarNuevaSesion}
-      />
-    </>
+      {terapiaSeleccionada && (
+        <Sesiones
+          sesiones={pacienteTerapias.sesiones || []}
+          terapiaPrincipal={terapiaSeleccionada}
+          compact={false}
+          onCrearSesion={() => toggleModal('sesion', true)}
+          modalOpen={modals.sesion}
+          onCloseModal={() => toggleModal('sesion', false)}
+          terapiaSeleccionada={terapiaSeleccionada}
+          onManejarNuevaSesion={manejarNuevaSesion}
+          loading={loading.sesiones}
+        />
+      )}
+    </div>
   );
 };
 

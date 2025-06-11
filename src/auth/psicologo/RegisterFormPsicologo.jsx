@@ -87,7 +87,7 @@ export function RegisterFormPsicologo() {
                   label="Nombre"
                   icon={User}
                   style={{ textTransform: 'capitalize' }} 
-                  placeholder="Ingrese tu nombre"
+                  placeholder="Ingrese Tu Nombre"
                   register={register}
                   errors={errors.nombre}
                   validation={validationRules.nombre}
@@ -98,7 +98,7 @@ export function RegisterFormPsicologo() {
                   label="Apellido"
                   icon={User}
                   style={{ textTransform: 'capitalize' }} 
-                  placeholder="Ingrese tu apellido"
+                  placeholder="Ingrese Su Apellido"
                   register={register}
                   errors={errors.apellido}
                   validation={validationRules.apellido}
@@ -114,7 +114,7 @@ export function RegisterFormPsicologo() {
                   label="Tipo de documento"
                   icon={File}
                   type="select"
-                  placeholder="Seleccione Tu Tipo De Documento"
+                  placeholder="Seleccione Su Tipo De Documento"
                   options={TIPOS_DOCUMENTO}
                   register={register}
                   errors={errors.tipoDoc}
@@ -124,7 +124,7 @@ export function RegisterFormPsicologo() {
                   id="documento"
                   label="Número de documento"
                   icon={FileText}
-                  placeholder="Ingrese Du Número De Documento"
+                  placeholder="Ingrese Su Número De Documento"
                   register={register}
                   errors={errors.documento}
                   validation={validationRules.documento}
@@ -133,7 +133,7 @@ export function RegisterFormPsicologo() {
                   id="fechaNacimiento"
                   label="Fecha de Nacimiento"
                   type="date"
-                  placeholder="Seleccione Tu Fecha De Nacimiento"
+                  placeholder="Seleccione Su Fecha De Nacimiento"
                   register={register}
                   errors={errors.fechaNacimiento}
                   validation={validationRules.fechaNacimiento}
@@ -143,7 +143,7 @@ export function RegisterFormPsicologo() {
                   label="Nombre de usuario"
                   icon={User}
                   style={{ textTransform: 'capitalize' }} 
-                  placeholder="Ingrese tu usuario"
+                  placeholder="Ingrese Su Usuario"
                   register={register}
                   errors={errors.username}
                   validation={validationRules.username}
@@ -154,7 +154,7 @@ export function RegisterFormPsicologo() {
                   label="Correo electrónico"
                   icon={Mail}
                   type="email"
-                  placeholder="Ingrese Tu Correo Electrónico"
+                  placeholder="Ingrese Su Correo Electrónico"
                   register={register}
                   errors={errors.email}
                   validation={validationRules.email}
@@ -164,7 +164,7 @@ export function RegisterFormPsicologo() {
                   label="Contraseña"
                   icon={Lock}
                   type={showPassword ? "text" : "password"}
-                  placeholder="Ingrese tu contraseña"
+                  placeholder="Ingrese Su contraseña"
                   register={register}
                   errors={errors.password}
                   validation={validationRules.password}
@@ -182,7 +182,7 @@ export function RegisterFormPsicologo() {
                   label="Especialidad"
                   icon={BriefcaseBusiness}
                   style={{ textTransform: 'capitalize' }} 
-                  placeholder="Ingrese tu especialidad"
+                  placeholder="Ingrese Su Especialidad"
                   register={register}
                   errors={errors.especialidad}
                   validation={validationRules.especialidad}
@@ -192,7 +192,7 @@ export function RegisterFormPsicologo() {
                   id="experiencia"
                   label="Experiencia"
                   icon={FileUser}
-                  placeholder="Ingrese Tu Experiencia En Años o Meses"
+                  placeholder="Ingrese Su Experiencia En Años o Meses"
                   register={register}
                   errors={errors.experiencia}
                   validation={validationRules.experiencia}
@@ -201,7 +201,7 @@ export function RegisterFormPsicologo() {
                   id="licencia"
                   label="Licencia"
                   icon={BookUser}
-                  placeholder="Ingrese Tu Licencia"
+                  placeholder="Ingrese Su Licencia"
                   register={register}
                   errors={errors.licencia}
                   validation={validationRules.licencia}

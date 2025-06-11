@@ -1,10 +1,9 @@
 import React from 'react';
-import { Plus, FileText, ChevronRight } from 'lucide-react';
+import { Plus, FileText } from 'lucide-react';
 import ModalNuevaSesion from './ModalNuevaSesion';
 
 const Sesiones = ({
   sesiones,
-  terapiaPrincipal,
   compact,
   onCrearSesion,
   modalOpen,
@@ -20,8 +19,7 @@ const Sesiones = ({
   };
 
   const formatTime = (timeArray) => {
-    if (!timeArray) return '-';
-    if (!Array.isArray(timeArray)) return '-';
+    if (!timeArray || !Array.isArray(timeArray)) return '-';
     const hours = (timeArray[0] ?? 0).toString().padStart(2, '0');
     const minutes = (timeArray[1] ?? 0).toString().padStart(2, '0');
     return `${hours}:${minutes}`;

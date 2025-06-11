@@ -83,7 +83,7 @@ const ListaPacientes = () => {
         )}
       </div>
 
-      {/* Estado de la búsqueda - responsive */}
+      {/* Estado de la búsqueda  */}
       {error ? (
         <div className="flex flex-col items-center justify-center p-6 sm:py-12 bg-red-50 rounded-lg">
           <Info className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 mb-2 sm:mb-3" />

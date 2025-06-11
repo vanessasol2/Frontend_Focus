@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import PatientInfo from './PacienteInfo';
 import TerapiaCards from './TerapiaCards';
 
+
 export default function HistorialClinicoPaciente() {
   const { id } = useParams();
 

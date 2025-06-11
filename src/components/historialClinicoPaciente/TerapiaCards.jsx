@@ -19,6 +19,7 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [terapiaSeleccionada, setTerapiaSeleccionada] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showTerapiaModal, setShowTerapiaModal] = useState(false);
   const navigate = useNavigate();
 
   const [sesiones, setLocalSesiones] = useState([]); 
@@ -62,28 +63,37 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
     if (pacienteId) cargarDatos();
   }, [pacienteId]);
 
-  const handleCrearTerapia = async (terapiaData) => {
-    try {
-      const terapiaCompleta = {
-        ...terapiaData,
-        idPaciente: pacienteId,
-        estado: 'En progreso'
-      };
+ const handleCrearTerapia = async (terapiaData) => {
+  try {
+    const terapiaCompleta = {
+      ...terapiaData,
+      idPaciente: pacienteId,
+      estado: 'En progreso'
+    };
 
-      const terapiaCreada = await crearTerapia(terapiaCompleta);
-      
-      setAllTerapias(prev => [...prev, terapiaCreada]);
-      setTerapiaPrincipal(terapiaCreada);
-      setTerapiaSeleccionada(terapiaCreada); // 👈
-      setShowModal(false);
-      setError(null);
-      setSesiones([]);
-      setLocalSesiones([]);
-    } catch (err) {
-      console.error('Error al crear terapia:', err);
-      setError(err.response?.data?.message || err.message || 'Error al crear la terapia');
+    await crearTerapia(terapiaCompleta);
+
+    const terapiasActualizadas = await getTerapia(pacienteId);
+    setAllTerapias(terapiasActualizadas);
+
+    if (terapiasActualizadas.length > 0) {
+      const terapiaPrincipal = terapiasActualizadas[0];
+      setTerapiaPrincipal(terapiaPrincipal);
+      setTerapiaSeleccionada(terapiaPrincipal);
+
+      const nuevasSesiones = await traerSesiones({ terapiaId: terapiaPrincipal.id });
+      setSesiones(nuevasSesiones);
+      setLocalSesiones(nuevasSesiones);
     }
-  };
+
+    setShowTerapiaModal(false);
+    setError(null);
+  } catch (err) {
+    console.error('Error al crear terapia:', err);
+    setError(err.response?.data?.message || err.message || 'Error al crear la terapia');
+  }
+};
+
 
   const abrirModal = () => {
     setModalOpen(true);
@@ -123,9 +133,10 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
         terapias={pacienteTerapias.allTerapias || []}
         terapiaPrincipal={pacienteTerapias.terapiaPrincipal}
         compact={compact}
-        onShowModal={() => setShowModal(true)}
+        onShowModal={() => setShowTerapiaModal(true)}
+        handleCrearTerapia={handleCrearTerapia}
         onClose={() => setShowModal(false)}
-        showModal={showModal}
+         showModal={showTerapiaModal}
         onSelectTerapia={(terapia) => {
           setTerapiaPrincipal(terapia);
           setTerapiaSeleccionada(terapia);

@@ -155,17 +155,17 @@ export const validationRules = {
       message: errorMessages.validation.maxLength.replace("{max}", "100"),
     },
   },
-  experiencia: {
-    required: errorMessages.validation.required,
-    pattern: {
-      value: /^[0-9]+$/,
-      message: errorMessages.validation.numeric || "Solo se permiten números",
-    },
-    maxLength: {
-      value: 500,
-      message: errorMessages.validation.maxLength.replace("{max}", "500"),
-    },
+experiencia: {
+  required: errorMessages.validation.required,
+  pattern: {
+    value: /^[a-zA-Z0-9\sáéíóúÁÉÍÓÚñÑ.,;:¿?¡!-]*$/, 
+    message: errorMessages.validation.alphanumeric || "Solo se permiten letras, números y espacios",
   },
+  maxLength: {
+    value: 500,
+    message: errorMessages.validation.maxLength.replace("{max}", "500"),
+  }
+},
   licencia: {
     required: errorMessages.validation.required,
     pattern: {

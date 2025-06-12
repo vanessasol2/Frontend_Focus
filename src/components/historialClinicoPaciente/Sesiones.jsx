@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, FileText } from 'lucide-react';
 import ModalNuevaSesion from './ModalNuevaSesion';
+import { finalizarSesion, cancelarSesion } from '../../service/terapiaService';
+import { CheckCircle, XCircle } from 'lucide-react';
 
 const Sesiones = ({
   sesiones,
@@ -9,8 +11,11 @@ const Sesiones = ({
   modalOpen,
   onCloseModal,
   terapiaSeleccionada,
-  onManejarNuevaSesion
+  onManejarNuevaSesion,
+  onSesionesActualizadas
 }) => {
+  const [loadingFinalizar, setLoadingFinalizar] = useState(null);
+  const [loadingCancelar, setLoadingCancelar] = useState(null);
 
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
@@ -37,6 +42,42 @@ const Sesiones = ({
         return 'bg-blue-100 text-blue-800';
       default:
         return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleFinalizarSesion = async (idSesion) => {
+    setLoadingFinalizar(idSesion);
+    try {
+      const datosFinalizacion = {
+        fechaFin: new Date().toISOString(),
+        estado: 'FINALIZADA'
+      };
+      await finalizarSesion(idSesion, datosFinalizacion);
+      alert('Sesión finalizada correctamente');
+      if (onSesionesActualizadas) onSesionesActualizadas();
+    } catch (error) {
+      alert('Error al finalizar la sesión');
+      console.error(error);
+    } finally {
+      setLoadingFinalizar(null);
+    }
+  };
+
+  const handleCancelarSesion = async (idSesion) => {
+    setLoadingCancelar(idSesion);
+    try {
+      const datosCancelacion = {
+        fechaFin: new Date().toISOString(),
+        estado: 'CANCELADA'
+      };
+      await cancelarSesion(idSesion, datosCancelacion);
+      alert('Sesión cancelada correctamente');
+      if (onSesionesActualizadas) onSesionesActualizadas();
+    } catch (error) {
+      alert('Error al cancelar la sesión');
+      console.error(error);
+    } finally {
+      setLoadingCancelar(null);
     }
   };
 
@@ -68,6 +109,7 @@ const Sesiones = ({
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Consulta</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Estado</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Notas</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -83,6 +125,68 @@ const Sesiones = ({
                         </span>
                       </td>
                       <td className="px-6 py-4">{sesion.notasAdicionales || '-'}</td>
+                      <td className="px-6 py-4">
+                        {(sesion.estado?.toUpperCase() !== 'FINALIZADA' && sesion.estado?.toUpperCase() !== 'CANCELADA') && (
+                          <>
+                            <button
+                              disabled={loadingFinalizar === sesion.id}
+                              onClick={() => handleFinalizarSesion(sesion.id)}
+                              className={`
+    
+                                flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all
+    ${loadingFinalizar === sesion.id ?
+                                  'bg-green-200 text-green-800 cursor-wait' :
+                                  'bg-green-500 text-white hover:bg-green-600 shadow-sm hover:shadow-md'
+                                }
+    disabled:opacity-70 disabled:cursor-not-allowed
+  `}
+                            >
+                              {loadingFinalizar === sesion.id ? (
+                                <>
+                                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  Finalizando...
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="h-3 w-3" />
+                                  Finalizar
+                                </>
+                              )}
+                            </button>
+
+                            <button
+                              disabled={loadingCancelar === sesion.id}
+                              onClick={() => handleCancelarSesion(sesion.id)}
+                              className={`
+                              flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all
+                              ${loadingCancelar === sesion.id ?
+                                  'bg-gray-200 text-gray-800 cursor-wait' :
+                                  'bg-gray-500 text-white hover:bg-gray-600 shadow-sm hover:shadow-md'
+                                }
+                                 disabled:opacity-70 disabled:cursor-not-allowed
+                              `}
+                            >
+                              {loadingCancelar === sesion.id ? (
+                                <>
+                                  <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  Cancelando...
+                                </>
+                              ) : (
+                                <>
+                                  <XCircle className="h-3 w-3" />
+                                  Cancelar
+                                </>
+                              )}
+                            </button>
+                          </>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

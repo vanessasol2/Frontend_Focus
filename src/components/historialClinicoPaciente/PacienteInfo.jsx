@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Calendar, HeartPulse, Pill, Gamepad2,
-  Phone, Mail, User, BookUser,
+  Phone, Mail, User,
   AlertCircle, Stethoscope, ClipboardList
 } from 'lucide-react';
 import { pacienteMetodoService } from '../../service/pacienteMetodoService';

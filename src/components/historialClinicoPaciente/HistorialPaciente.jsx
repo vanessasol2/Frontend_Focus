@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom'; 
 import PatientInfo from './PacienteInfo';
 import TerapiaCards from './TerapiaCards';
+import NotesCard from './NotesCard';
 
 
 export default function HistorialClinicoPaciente() {

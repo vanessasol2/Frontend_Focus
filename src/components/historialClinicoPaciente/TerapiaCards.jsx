@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Toaster, toast } from "sonner";
 import { crearTerapia, crearSesion, getTerapia, traerSesiones } from '../../service/terapiaService';
 import useTerapiaState from '../../hook/useTerapiaState';
 import Terapia from './Terapia';
@@ -24,14 +25,12 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
   const [terapiaSeleccionada, setTerapiaSeleccionada] = useState(null);
   const navigate = useNavigate();
 
-  // Cargar datos iniciales
   useEffect(() => {
     const cargarDatos = async () => {
       try {
         setLoading(prev => ({ ...prev, terapias: true }));
         setError(null);
 
-        // 1. Cargar terapias
         const terapias = await getTerapia(pacienteId);
         
         if (!terapias || !Array.isArray(terapias)) {
@@ -45,8 +44,7 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
           setTerapiaPrincipal(terapiaPrincipal);
           setTerapiaSeleccionada(terapiaPrincipal);
           
-          // 2. Cargar sesiones para la terapia principal
-          await cargarSesiones(terapiaPrincipal.id);
+        await cargarSesiones(pacienteId);
         }
       } catch (err) {
         console.error('Error al cargar datos:', err);
@@ -59,11 +57,12 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
     if (pacienteId) cargarDatos();
   }, [pacienteId]);
 
-  // Función para cargar sesiones
-  const cargarSesiones = async (terapiaId) => {
+  const cargarSesiones = async (pacienteId) => {
     try {
       setLoading(prev => ({ ...prev, sesiones: true }));
-      const sesionesData = await traerSesiones({ terapiaId });
+      const sesionesData = await traerSesiones( pacienteId );
+          console.log('Sesiones recibidas:', sesionesData); 
+
       setSesiones(sesionesData);
     } catch (err) {
       console.error('Error al cargar sesiones:', err);
@@ -73,14 +72,12 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
     }
   };
 
-  // Manejar cambio de terapia seleccionada
   const handleSelectTerapia = async (terapia) => {
     setTerapiaPrincipal(terapia);
     setTerapiaSeleccionada(terapia);
     await cargarSesiones(terapia.id);
   };
 
-  // Crear nueva terapia
   const handleCrearTerapia = async (terapiaData) => {
     try {
       const terapiaCompleta = {
@@ -89,12 +86,11 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
         estado: 'En progreso'
       };
 
-      const terapiaCreada = await crearTerapia(terapiaCompleta);
+      const terapiaCreada = await crearTerapia(pacienteId, terapiaData);
       addTerapia(terapiaCreada);
       setTerapiaPrincipal(terapiaCreada);
       setTerapiaSeleccionada(terapiaCreada);
       
-      // Cargar sesiones para la nueva terapia
       await cargarSesiones(terapiaCreada.id);
       
       setModals(prev => ({ ...prev, terapia: false }));
@@ -105,28 +101,38 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
     }
   };
 
-  // Crear nueva sesión
-  const manejarNuevaSesion = async (nuevaSesion) => {
-    try {
-      if (!terapiaSeleccionada) {
-        throw new Error('No hay terapia seleccionada');
-      }
 
-      const sesionConTerapia = {
-        ...nuevaSesion,
-        terapiaId: terapiaSeleccionada.id,
-      };
 
-      const sesionCreada = await crearSesion(sesionConTerapia);
-      addSesion(sesionCreada);
-      setModals(prev => ({ ...prev, sesion: false }));
-    } catch (error) {
-      console.error('Error al crear la sesión:', error);
-      setError(error.message || 'Error al crear la sesión');
+const manejarNuevaSesion = async (nuevaSesion) => {
+  try {
+    if (!terapiaSeleccionada) {
+      throw new Error('No hay terapia seleccionada');
     }
-  };
 
-  // Control de modales
+    const sesionConTerapia = {
+      ...nuevaSesion,
+      idTerapia: terapiaSeleccionada.id,
+      idPaciente: pacienteId
+    };
+
+    const sesionCreada = await crearSesion(sesionConTerapia);
+    addSesion(sesionCreada);
+    setModals(prev => ({ ...prev, sesion: false }));
+
+    toast.success("Sesión creada correctamente");
+    
+  } catch (error) {
+    console.error('Error al crear la sesión:', error);
+
+    const mensajeError = error.response?.data?.message || 'Error al crear la sesión';
+
+    toast.error(mensajeError);
+
+    setError(mensajeError);
+  }
+};
+
+
   const toggleModal = (modalName, isOpen) => {
     setModals(prev => ({ ...prev, [modalName]: isOpen }));
   };
@@ -148,7 +154,7 @@ const TerapiaCards = ({ pacienteId, compact = false }) => {
         compact={compact}
         onShowModal={() => toggleModal('terapia', true)}
         handleCrearTerapia={handleCrearTerapia}
-        onClose={() => toggleModal('terapia', false)}
+        onCloseModal={() => toggleModal('terapia', false)}
         showModal={modals.terapia}
         onSelectTerapia={handleSelectTerapia}
       />

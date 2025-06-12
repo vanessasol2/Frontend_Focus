@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   CalendarCheck2,
   SquareCheckBig,
@@ -13,41 +14,7 @@ import ReunionesContenedor from "../../components/homePsicologo/ReunionesContene
 
 const HomePsicologo = () => {
   const [date, setDate] = useState(new Date());
-
-  const resumenData = [
-    {
-      title: "Total Citas",
-      icon: <CalendarCheck2 className="text-violet-700" />,
-      circleColor: "bg-violet-200",
-      cardColor: "bg-violet-50",
-      value: 10,
-      link: "/citas-psicologo",
-    },
-    {
-      title: "Citas Completadas",
-      icon: <SquareCheckBig className="text-green-700" />,
-      circleColor: "bg-green-200",
-      cardColor: "bg-green-50",
-      value: 4,
-      link: "/citas-psicologo",
-    },
-    {
-      title: "Citas Pendientes",
-      icon: <ClockAlert className="text-yellow-700" />,
-      circleColor: "bg-yellow-200",
-      cardColor: "bg-yellow-50",
-      value: 5,
-      link: "/citas-psicologo",
-    },
-    {
-      title: "Citas Canceladas",
-      icon: <BanIcon className="text-red-700" />,
-      circleColor: "bg-red-200",
-      cardColor: "bg-red-50",
-      value: 3,
-      link: "/citas-psicologo",
-    },
-  ];
+  const [resumenData, setResumenData] = useState([]);
 
   const pacientes = [
     "Sara Mateus",
@@ -81,6 +48,74 @@ const HomePsicologo = () => {
     },
   ];
 
+  useEffect(() => {
+  const fetchResumenData = async () => {
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await axios.get('http://localhost:8081/sesion/sesiones', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const backendData = response.data;
+      if (!Array.isArray(backendData)) {
+        console.error("Datos inesperados:", backendData);
+        setResumenData([]); 
+        return;
+      }
+      
+      const getCantidadByEstado = (estado) => {
+        const item = backendData.find(item => item.estado === estado);
+        return item ? item.cantidad : 0;
+      };
+
+      const totalCitas = backendData.reduce((sum, item) => sum + item.cantidad, 0);
+
+      const resumen = [
+        {
+          title: "Total Citas",
+          icon: <CalendarCheck2 className="text-violet-700" />,
+          circleColor: "bg-violet-200",
+          cardColor: "bg-violet-50",
+          value: totalCitas,
+          link: "/citas-psicologo",
+        },
+        {
+          title: "Citas Completadas",
+          icon: <SquareCheckBig className="text-green-700" />,
+          circleColor: "bg-green-200",
+          cardColor: "bg-green-50",
+          value: getCantidadByEstado("COMPLETADA"),
+          link: "/citas-psicologo",
+        },
+        {
+          title: "Citas Pendientes",
+          icon: <ClockAlert className="text-yellow-700" />,
+          circleColor: "bg-yellow-200",
+          cardColor: "bg-yellow-50",
+          value: getCantidadByEstado("PENDIENTE"),
+          link: "/citas-psicologo",
+        },
+        {
+          title: "Citas Canceladas",
+          icon: <BanIcon className="text-red-700" />,
+          circleColor: "bg-red-200",
+          cardColor: "bg-red-50",
+          value: getCantidadByEstado("CANCELADA"),
+          link: "/citas-psicologo",
+        },
+      ];
+
+      setResumenData(resumen);
+
+    } catch (error) {
+      console.error("Error al obtener los datos del resumen:", error);
+    }
+  };
+
+  fetchResumenData();
+}, []);
   return (
     <MainLayoutPsicologo>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-6 mt-8">

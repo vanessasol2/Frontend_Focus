@@ -61,8 +61,9 @@ const ModalNuevaTerapia = ({ isOpen, onClose, onSubmit }) => {
             <input
               name="descripcion"
               type="text"
-              className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.descripcion ? 'border-red-500' : 'border-gray-300'
-                }`}
+              className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
+                  }`}
             />
             {errors.descripcion && (
               <p className="mt-1 text-sm text-red-500">{errors.descripcion}</p>
@@ -75,7 +76,8 @@ const ModalNuevaTerapia = ({ isOpen, onClose, onSubmit }) => {
               <input
                 name="fechaInicio"
                 type="date"
-                className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.fechaInicio ? 'border-red-500' : 'border-gray-300'
+                className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
                   }`}
               />
               {errors.fechaInicio && (
@@ -88,7 +90,8 @@ const ModalNuevaTerapia = ({ isOpen, onClose, onSubmit }) => {
               <input
                 name="fechaFin"
                 type="date"
-                className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.fechaFin ? 'border-red-500' : 'border-gray-300'
+                className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
                   }`}
               />
               {errors.fechaFin && (
@@ -119,8 +122,9 @@ const ModalNuevaTerapia = ({ isOpen, onClose, onSubmit }) => {
               type="number"
               min="1"
               defaultValue="1"
-              className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.numeroSesiones ? 'border-red-500' : 'border-gray-300'
-                }`}
+             className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
+                  }`}
             />
             {errors.numeroSesiones && (
               <p className="mt-1 text-sm text-red-500">{errors.numeroSesiones}</p>

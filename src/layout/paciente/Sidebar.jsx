@@ -39,8 +39,6 @@ const Sidebar = () => {
       <nav className="sidebar__nav">
         <SidebarLink to="/home-paciente" text="Dashboard" icon={<HomeIcon />} active={isActive("/home-paciente")} expanded={expanded} />
         <SidebarLink to="/citas" text="Citas" icon={<BriefcaseMedical />} active={isActive("/citas")} expanded={expanded} />
-        <SidebarLink to="/pagos" text="Pagos" icon={<CircleDollarSign />} active={isActive("/pagos")} expanded={expanded} />
-        <SidebarLink to="/comunicacion" text="Comunicación" icon={<MessageSquareText />} active={isActive("/comunicacion")} expanded={expanded} />
         <SidebarLink to="/historial" text="Historial Clínico" icon={<ScanHeart />} active={isActive("/historial")} expanded={expanded} />
       </nav>
 

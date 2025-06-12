@@ -10,8 +10,15 @@ const ListaPacientes = () => {
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
   useEffect(() => {
     const buscarPacientes = async () => {
+      if (!token) {
+        setError("No hay token de autenticación");
+        return;
+      }
+
       if (searchTerm.trim() === "") {
         setPacientes([]);
         setHasSearched(false);
@@ -22,33 +29,56 @@ const ListaPacientes = () => {
         setCargando(true);
         setError(null);
 
-        const response = await axios.get(`http://localhost:8081/paciente/buscarPaciente`, {
-          params: {
-            busqueda: searchTerm
+        const response = await axios.get(
+          "http://localhost:8081/paciente/buscarPaciente",
+          {
+            params: { busqueda: searchTerm },
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token.trim()}`
+            },
           }
-        });
+        );
 
-        setPacientes(response.data);
+        const pacientesData = Array.isArray(response.data) ? response.data : [response.data];
+
+        setPacientes(pacientesData.map(paciente => ({
+          id: paciente.id,
+          nombreCompleto: obtenerNombreCompleto(paciente),
+          email: paciente.email || 'No disponible',
+          telefono: paciente.telefono || 'No disponible'
+        })));
+
         setHasSearched(true);
       } catch (err) {
-        setError("Error al buscar pacientes. Por favor, intente nuevamente.");
-        console.error("Error fetching pacientes:", err);
+        console.error("Error detallado:", err.response?.data);
+        setError(
+          err.response?.data?.message ||
+          "Error al buscar pacientes. Verifica tu conexión y permisos."
+        );
       } finally {
         setCargando(false);
       }
     };
 
-    const delayDebounce = setTimeout(() => {
-      buscarPacientes();
+    const timer = setTimeout(() => {
+      if (searchTerm.trim()) buscarPacientes();
     }, 500);
 
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm]);
+    return () => clearTimeout(timer);
+  }, [searchTerm, token]);
+
+
+  const obtenerNombreCompleto = (paciente) => {
+    if (paciente.nombreCompleto) return paciente.nombreCompleto;
+    return `${paciente.primerNombre || ''} ${paciente.segundoNombre || ''} ${paciente.primerApellido || ''} ${paciente.segundoApellido || ''}`.trim();
+  };
 
   const handleClearSearch = () => {
     setSearchTerm("");
     setPacientes([]);
     setHasSearched(false);
+    setError(null);
   };
 
   return (
@@ -62,12 +92,11 @@ const ListaPacientes = () => {
         )}
       </div>
 
-      {/* Barra de búsqueda responsive */}
       <div className="relative flex items-center bg-white rounded-md px-3 py-2 sm:px-4 sm:py-2 shadow-xs border border-gray-200 focus-within:border-primary-color focus-within:ring-1 focus-within:ring-primary-color/10 mb-4 sm:mb-6 transition-all duration-150">
         <Search className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-2" />
         <input
           type="text"
-          placeholder="Buscar pacientes..."
+          placeholder="Buscar por nombre "
           className="flex-1 outline-none bg-transparent text-sm sm:text-base text-gray-700 placeholder-gray-400"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -83,7 +112,6 @@ const ListaPacientes = () => {
         )}
       </div>
 
-      {/* Estado de la búsqueda  */}
       {error ? (
         <div className="flex flex-col items-center justify-center p-6 sm:py-12 bg-red-50 rounded-lg">
           <Info className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 mb-2 sm:mb-3" />
@@ -119,12 +147,21 @@ const ListaPacientes = () => {
                     <User className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary-color" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm sm:text-base font-semibold text-gray-800 truncate">{paciente.nombre}</p>
-                    {paciente.email && (
-                      <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full">
-                        {paciente.email} 
-                      </span>
-                    )}
+                    <p className="text-sm sm:text-base font-semibold text-gray-800 truncate">
+                      {paciente.nombreCompleto}
+                    </p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {paciente.email && (
+                        <span className="inline-block px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full">
+                          {paciente.email}
+                        </span>
+                      )}
+                      {paciente.telefono && (
+                        <span className="inline-block px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full">
+                          Tel: {paciente.telefono}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </li>
@@ -140,7 +177,7 @@ const ListaPacientes = () => {
       ) : (
         <div className="flex flex-col items-center justify-center p-6 sm:py-12 bg-gray-50 rounded-lg">
           <Search className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2 sm:mb-3" />
-          <p className="text-center text-sm sm:text-base text-gray-500 font-medium">Busca pacientes por nombre</p>
+          <p className="text-center text-sm sm:text-base text-gray-500 font-medium">Busca pacientes</p>
           <p className="text-xs sm:text-sm text-gray-400 mt-1">Escribe en el campo de búsqueda para comenzar</p>
         </div>
       )}

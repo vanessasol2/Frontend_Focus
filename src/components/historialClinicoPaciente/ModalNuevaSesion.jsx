@@ -50,29 +50,37 @@ const ModalNuevaSesion = ({ isOpen, onClose, onSubmit, idPaciente, idTerapia }) 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-sm font-medium text-gray-700">Fecha de sesión*</label>
-            <input name="fechaSesion" type="date" defaultValue={fechaHoy} className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.fechaSesion ? 'border-red-500' : 'border-gray-300'}`} />
+            <input name="fechaSesion" type="date" defaultValue={fechaHoy} className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
+                  }`} />
             {errors.fechaSesion && (<p className="mt-1 text-sm text-red-500">{errors.fechaSesion}</p>)}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700">Hora de inicio*</label>
-              <input name="horaInicio" type="time" className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.horaInicio ? 'border-red-500' : 'border-gray-300'}`} />
+              <input name="horaInicio" type="time" className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
+                  }`} />
               {errors.horaInicio && (<p className="mt-1 text-sm text-red-500">{errors.horaInicio}</p>)}
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700">Hora de fin*</label>
-              <input name="horaFin" type="time" className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.horaFin ? 'border-red-500' : 'border-gray-300'}`} />
+              <input name="horaFin" type="time" className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
+                  }`} />
               {errors.horaFin && (<p className="mt-1 text-sm text-red-500">{errors.horaFin}</p>)}
             </div>
           </div>
           <div>
-            <label className="text-sm font-medium text-gray-700">Nombre*</label>
-            <input name="nombre" type="text" className={`w-full mt-1 border rounded-md p-2 text-sm ${errors.nombre ? 'border-red-500' : 'border-gray-300'}`} />
+            <label className="text-sm font-medium text-gray-700">Nombre de la sesión*</label>
+            <input name="nombre" type="text" className={`w-full mt-1 border rounded-md p-2 text-sm focus:outline-none focus:ring-2 ${errors.fechaInicio ? "border-red-500 bg-red-50 focus:ring-red-200"
+                    : "border-gray-300 hover:border-gray-400 focus:ring-violet-300 focus:border-primary-color"
+                  }`}/>
             {errors.nombre && (<p className="mt-1 text-sm text-red-500">{errors.nombre}</p>)}
           </div>
           <div>
             <label className="text-sm font-medium text-gray-700">Notas adicionales</label>
-            <textarea name="notasAdicionales" rows="3" className="w-full mt-1 border border-gray-300 rounded-md p-2 text-sm" />
+            <textarea name="notasAdicionales" rows="3" className="w-full mt-1 border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300 focus:border-primary-color" />
           </div>
           <button type="submit" className="w-full bg-primary-color text-white rounded-md py-2 text-sm font-medium hover:bg-secundary-color">
             Guardar Sesión

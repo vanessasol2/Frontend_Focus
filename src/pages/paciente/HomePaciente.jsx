@@ -3,7 +3,6 @@ import MainLayout from "../../layout/paciente/MainLayout";
 import Resumen from "../../components/homePaciente/Resumen";
 import "../../components/homePaciente/Resumen.css";
 import RecentAppointments from "../../components/homePaciente/RecentAppointments";
-import Notes from "../../components/homePaciente/Notes";
 import { UsersRound, CalendarCheck2, SquareCheckBig, ClockAlert, BookCopy, UserCheck, BanIcon } from "lucide-react";
 
 const HomePaciente = () => {
@@ -25,7 +24,6 @@ const HomePaciente = () => {
       <Resumen resumenData={resumenData} />
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10 px-6">
         <RecentAppointments appointments={appointments} />
-        <Notes />
       </section>
     </MainLayout>
   );

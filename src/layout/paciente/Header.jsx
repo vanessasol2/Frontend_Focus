@@ -12,9 +12,7 @@ const Header = () => {
   const routeNames = {
     "/home-paciente": `Bienvenido, ${userName}`,
     "/citas": "Mis Citas",
-    "/pagos": "Pagos",
     "/historial": "Historial Clínico",
-    "/comunicacion": "Comunicación",
   };
 
   const getRouteName = (path) => {

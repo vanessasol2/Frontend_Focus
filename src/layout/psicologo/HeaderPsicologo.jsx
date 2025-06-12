@@ -1,7 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Notificaciones from "../../components/header/Notifications";
 import Perfil from '../../components/header/perfil';
 import "../style/Header.css";
 
@@ -22,15 +21,29 @@ const HeaderPsicologo = () => {
   const getRouteName = (path) => {
     if (routeNames[path]) return routeNames[path];
 
-    if (path.includes('/pacientes/') && path.includes('/historial-clinico')) {
+
+    if (path.match(/\/pacientes\/\d+\/historial-clinico/)) {
       return "Historial Clínico";
+    }
+
+    if (path.match(/\/historial-clinico\/\d+/)) {
+      const pacienteId = path.split('/').pop();
+      return `Historial de Paciente ${pacienteId}`;
     }
 
     return path.split("/").pop().replace(/-/g, " ");
   };
 
   const getPageTitle = () => {
-    return getRouteName(location.pathname);
+    const path = location.pathname;
+    
+
+    if (path.match(/\/historial-clinico\/\d+/)) {
+      const pacienteId = path.split('/').pop();
+      return `Historial de Paciente ${pacienteId}`;
+    }
+    
+    return getRouteName(path);
   };
 
   const generateBreadcrumb = () => {
@@ -55,22 +68,53 @@ const HeaderPsicologo = () => {
       const isLast = i === paths.length - 1;
 
       let routeName;
+      let skipAhead = 0;
+      let makePlain = false;
 
-      if (path === "pacientes" && paths[i + 1] && paths[i + 2] === "historial-clinico") {
+
+      if (path === "pacientes" && paths[i + 1] && isNumber.test(paths[i + 1]) && paths[i + 2] === "historial-clinico") {
+        breadcrumbItems.push(
+          <li key="pacientes">
+            <Link to="/pacientes" className="breadcrumb-link">
+              Mis Pacientes
+            </Link>
+          </li>
+        );
+        
+        breadcrumbItems.push(
+          <li key={`${currentPath}/${paths[i + 1]}`}>
+            <Link to={`${currentPath}/${paths[i + 1]}`} className="breadcrumb-link">
+              Paciente {paths[i + 1]}
+            </Link>
+          </li>
+        );
+        
         routeName = "Historial Clínico";
         currentPath += `/${paths[i + 1]}/${paths[i + 2]}`;
-        i += 2;
-      } else if (paths[i - 1] === "pacientes" && isNumber.test(path)) {
-        routeName = `Paciente ${path}`;
-      } else {
-        routeName = getRouteName(currentPath);
+        skipAhead = 2;
       }
 
-      const makePlain = path === "pacientes" || isNumber.test(path);
+      else if (path === "historial-clinico" && paths[i + 1] && isNumber.test(paths[i + 1])) {
+        breadcrumbItems.push(
+          <li key="pacientes">
+            <Link to="/pacientes" className="breadcrumb-link">
+              Mis Pacientes
+            </Link>
+          </li>
+        );
+        
+        routeName = `Historial de Paciente ${paths[i + 1]}`;
+        currentPath += `/${paths[i + 1]}`;
+        skipAhead = 1;
+      }
+      else {
+        routeName = getRouteName(currentPath);
+        makePlain = isNumber.test(path) || isLast;
+      }
 
       breadcrumbItems.push(
         <li key={currentPath}>
-          {isLast || makePlain ? (
+          {makePlain ? (
             <span className="breadcrumb-active" aria-current={isLast ? "page" : undefined}>
               {routeName}
             </span>
@@ -81,11 +125,12 @@ const HeaderPsicologo = () => {
           )}
         </li>
       );
+
+      i += skipAhead;
     }
 
-
     return breadcrumbItems;
-  };
+};
 
   return (
     <header className="header" role="banner">
@@ -101,7 +146,6 @@ const HeaderPsicologo = () => {
           </nav>
         </div>
         <div className="user-info">
-          <Notificaciones />
           <Perfil/>
         </div>
       </div>

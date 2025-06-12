@@ -9,6 +9,7 @@ const HOBBIES_OPTIONS = [
   { value: 'VIDEOJUEGOS', label: 'Videojuegos' },
   { value: 'MUSICA', label: 'Música' },
   { value: 'COCINA', label: 'Cocina' },
+  { value: 'Ninguno', label: 'NINGUNO' },
   { value: 'OTRO', label: 'Otro' }
 ];
 
@@ -28,6 +29,7 @@ const MEDICAMENTOS_OPTIONS = [
   { value: 'Lisinopril', label: 'Lisinopril' },
   { value: 'Sertralina', label: 'Sertralina' },
   { value: 'Diazepam', label: 'Diazepam' },
+  { value: 'Ninguna', label: 'Ninguna' },
   { value: 'Otro', label: 'Otro' }
 ];
 
@@ -47,7 +49,7 @@ const ENFERMEDADES_OPTIONS = [
   { value: 'EnfermedadCardiaca', label: 'Enfermedad cardiaca' },
   { value: 'Obesidad', label: 'Obesidad' },
   { value: 'Alzheimer', label: 'Alzheimer' },
-  { value: 'ninguna', label: 'Ninguna' },
+  { value: 'Ninguna', label: 'ninguna' },
   { value: 'otro', label: 'Otro' }
 ];
 

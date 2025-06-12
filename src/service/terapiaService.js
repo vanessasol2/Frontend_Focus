@@ -24,20 +24,53 @@ export const crearSesion = async (sesionData) => {
 
     return response.data;
   } catch (error) {
-    console.error("Error al crear la sesión:", error);
+    console.error("Error al crear la sesión:", error.response?.data || error.message);
     throw error;
   }
 };
 
-export const traerSesiones = async (pacienteId) => {
+export const cancelarSesion = async (sesionId, datosCancelacion) => {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
   try {
-    const response = await axios.get(`${API_URL}/funcionario/sesiones`, {
+    const response = await axios.delete(
+      `${API_URL}/sesion/cancelarSesion/${sesionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: datosCancelacion  
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error al cancelar la sesión - Backend response:");
+      console.error("Status:", error.response.status);
+      console.error("Data:", error.response.data);
+      console.error("Headers:", error.response.headers);
+    } else if (error.request) {
+      console.error("No response received:", error.request);
+    } else {
+      console.error("Error al hacer la petición:", error.message);
+    }
+    throw error;
+  }
+};
+
+
+
+export const traerSesiones = async (idPaciente) => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  try {
+     const response = await axios.get(`http://localhost:8081/paciente/sesiones/${idPaciente}`, {
       headers: {
         Authorization: `Bearer ${token}`,
-      },
+      }
     });
+
 
     return response.data; 
   } catch (error) {
@@ -46,6 +79,56 @@ export const traerSesiones = async (pacienteId) => {
   }
 };
 
+export const finalizarSesion = async (sesionId, datosFinalizacion = {}) => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  try {
+    const response = await axios.put(
+      `${API_URL}/sesion/finalizarSesion/${sesionId}`,
+      datosFinalizacion,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error al finalizar la sesión:", error);
+    throw error;
+  }
+};
+
+
+
+
+export const traerSesionesCard = async () => {
+  const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+  try {
+    const response = await axios.get(`http://localhost:8081/funcionario/sesiones`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+
+    return response.data.map(sesion => ({
+      id: sesion.id,
+      nombrePaciente: sesion.nombrePaciente ,
+      fechaSesion: sesion.fechaSesion,
+      horaInicio: sesion.horaInicio,
+      horaFin: sesion.horaFin,
+      notas: sesion.descripcion || '',
+      estado: sesion.estado || 'PENDIENTE',
+      agendadaPorPaciente: sesion.agendadaPorPaciente || false
+    }));
+    
+  } catch (error) {
+    console.error("Error al obtener las sesiones:", error.response?.data || error.message);
+    throw error; 
+  }
+};
 
 
 export const crearTerapia = async (idPaciente, terapiaData) => {
@@ -102,3 +185,4 @@ export const finalizarTerapia = async (terapiaId, datosFinalizacion = {}) => {
     throw error;
   }
 };
+

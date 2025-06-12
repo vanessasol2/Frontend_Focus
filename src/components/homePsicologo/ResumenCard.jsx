@@ -14,7 +14,9 @@ const ResumenCard = ({ title, icon, circleColor, cardColor, value, link, context
         </div>
         <div>
           <h3 className="text-gray-800 font-semibold text-base">{title}</h3>
-          <p className="text-sm text-gray-600">{value} Citas</p>
+          <p className="text-sm text-gray-600">
+            {value || 0} {value === 1 ? "Cita" : "Citas"}
+          </p>
         </div>
       </div>
 

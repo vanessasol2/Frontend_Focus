@@ -15,7 +15,6 @@ import RestablecerContrasena from "./auth/paciente/RestablecerContrasena";
 //Paciente
 import HomePaciente from "./pages/paciente/HomePaciente";
 import CitasPaciente from "./pages/paciente/CitasPaciente";
-import PagosPaciente from "./pages/paciente/PagosPaciente";
 import HistorialPaciente from "./pages/paciente/HistorialPaciente";
 import ComunicacionPaciente from "./pages/paciente/ComunicacionPaciente";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -91,14 +90,6 @@ function App() {
         }
       />
 
-      <Route
-        path="/pagos"
-        element={
-          <ProtectedRoute allowedRoles={["PACIENTE"]}>
-            <PagosPaciente />
-          </ProtectedRoute>
-        }
-      />
 
       <Route
         path="/historial"

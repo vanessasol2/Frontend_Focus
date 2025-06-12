@@ -338,7 +338,7 @@ const CrearHistorialClinico = () => {
                     onChange={handleChange}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg border-gray-300 hover:border-primary-color focus:border-primary-color
                       focus:outline-none focus:ring-2 focus:ring-violet-200 transition-all"
-                    placeholder="Parentesco con el paciente"
+                    placeholder="Parentesco "
                     required
                     disabled={loading}
                   />

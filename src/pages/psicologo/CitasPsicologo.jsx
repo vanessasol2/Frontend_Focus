@@ -163,7 +163,7 @@ const CitasPsicologo = () => {
   return (
     <MainLayoutPsicologo>
       <div className="p-4 mt-7">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Gestión de Citas</h1>
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Calendario de Citas </h1>
 
         {cargando ? (
           <div className="flex justify-center items-center h-64">

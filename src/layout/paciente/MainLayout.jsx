@@ -20,7 +20,6 @@ const MainLayout = ({ children }) => {
   );
 };
 
-// Validaciones de PropTypes
 MainLayout.propTypes = {
   children: PropTypes.oneOfType([
     PropTypes.arrayOf(PropTypes.node),

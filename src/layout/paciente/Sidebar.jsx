@@ -37,7 +37,7 @@ const Sidebar = () => {
       </div>
 
       <nav className="sidebar__nav">
-        <SidebarLink to="/home-paciente" text="Dashboard" icon={<HomeIcon />} active={isActive("/home-paciente")} expanded={expanded} />
+        <SidebarLink to="/home-paciente" text="Inicio" icon={<HomeIcon />} active={isActive("/home-paciente")} expanded={expanded} />
         <SidebarLink to="/citas" text="Citas" icon={<BriefcaseMedical />} active={isActive("/citas")} expanded={expanded} />
         <SidebarLink to="/historial" text="Historial Clínico" icon={<ScanHeart />} active={isActive("/historial")} expanded={expanded} />
       </nav>
@@ -45,7 +45,7 @@ const Sidebar = () => {
       <div className="sidebar__logout">
         <button onClick={handleLogout} className="logout-button">
           <LogOut className="logout-icon" />
-          {expanded && <span className="logout-text">Sign out</span>}
+          {expanded && <span className="logout-text">Cerrar Sesión</span>}
         </button>
       </div>
     </aside>

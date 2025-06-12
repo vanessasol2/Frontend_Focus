@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import Notificaciones from "../../components/header/Notifications";
+import Perfil from '../../components/header/perfil';
 import "../style/Header.css";
 
 const Header = () => {
@@ -76,7 +76,7 @@ const Header = () => {
           </nav>
         </div>
         <div className="user-info">
-          <Notificaciones />
+          <Perfil/>
         </div>
       </div>
     </header>

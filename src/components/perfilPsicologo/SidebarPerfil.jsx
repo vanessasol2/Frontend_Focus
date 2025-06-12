@@ -8,17 +8,6 @@ const SidebarPerfil = ({ activeTab, setActiveTab }) => {
       <ul className="space-y-2">
         <li
           className={`px-3 py-2 rounded-lg cursor-pointer flex items-center gap-2 transition-colors ${
-            activeTab === 'profile'
-              ? 'bg-violet-100 text-primary-color font-medium'
-              : 'hover:bg-gray-100 text-gray-700'
-          }`}
-          onClick={() => setActiveTab('profile')}
-        >
-          <UserCircle size={16} />
-          Perfil
-        </li>
-        <li
-          className={`px-3 py-2 rounded-lg cursor-pointer flex items-center gap-2 transition-colors ${
             activeTab === 'password'
               ? 'bg-violet-100 text-primary-color font-medium'
               : 'hover:bg-gray-100 text-gray-700'

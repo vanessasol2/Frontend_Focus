@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, FileText } from 'lucide-react';
+import { Toaster, toast } from "sonner";
 import ModalNuevaSesion from './ModalNuevaSesion';
 import { finalizarSesion, cancelarSesion } from '../../service/terapiaService';
 import { CheckCircle, XCircle } from 'lucide-react';
@@ -16,6 +17,10 @@ const Sesiones = ({
 }) => {
   const [loadingFinalizar, setLoadingFinalizar] = useState(null);
   const [loadingCancelar, setLoadingCancelar] = useState(null);
+  const [confirmacionCancelar, setConfirmacionCancelar] = useState({
+    isOpen: false,
+    idSesion: null
+  });
 
   const formatDate = (dateString) => {
     if (!dateString) return 'No definida';
@@ -63,21 +68,41 @@ const Sesiones = ({
     }
   };
 
-  const handleCancelarSesion = async (idSesion) => {
-    setLoadingCancelar(idSesion);
+  const abrirConfirmacionCancelar = (idSesion) => {
+    setConfirmacionCancelar({
+      isOpen: true,
+      idSesion
+    });
+  };
+
+  const cerrarConfirmacionCancelar = () => {
+    setConfirmacionCancelar({
+      isOpen: false,
+      idSesion: null
+    });
+  };
+
+  const handleConfirmarCancelacion = async () => {
+    if (!confirmacionCancelar.idSesion) return;
+    
+    setLoadingCancelar(confirmacionCancelar.idSesion);
     try {
       const datosCancelacion = {
         fechaFin: new Date().toISOString(),
         estado: 'CANCELADA'
       };
-      await cancelarSesion(idSesion, datosCancelacion);
-      alert('Sesión cancelada correctamente');
+      await cancelarSesion(confirmacionCancelar.idSesion, datosCancelacion);
+      toast.success('Sesión cancelada correctamente', {
+        position: 'top-right',
+        duration: 9000
+      });
       if (onSesionesActualizadas) onSesionesActualizadas();
     } catch (error) {
       alert('Error al cancelar la sesión');
       console.error(error);
     } finally {
       setLoadingCancelar(null);
+      cerrarConfirmacionCancelar();
     }
   };
 
@@ -125,21 +150,20 @@ const Sesiones = ({
                         </span>
                       </td>
                       <td className="px-6 py-4">{sesion.notasAdicionales || '-'}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 space-x-2">
                         {(sesion.estado?.toUpperCase() !== 'FINALIZADA' && sesion.estado?.toUpperCase() !== 'CANCELADA') && (
                           <>
                             <button
                               disabled={loadingFinalizar === sesion.id}
                               onClick={() => handleFinalizarSesion(sesion.id)}
                               className={`
-    
                                 flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all
-    ${loadingFinalizar === sesion.id ?
+                                ${loadingFinalizar === sesion.id ?
                                   'bg-green-200 text-green-800 cursor-wait' :
                                   'bg-green-500 text-white hover:bg-green-600 shadow-sm hover:shadow-md'
                                 }
-    disabled:opacity-70 disabled:cursor-not-allowed
-  `}
+                                disabled:opacity-70 disabled:cursor-not-allowed
+                              `}
                             >
                               {loadingFinalizar === sesion.id ? (
                                 <>
@@ -159,14 +183,14 @@ const Sesiones = ({
 
                             <button
                               disabled={loadingCancelar === sesion.id}
-                              onClick={() => handleCancelarSesion(sesion.id)}
+                              onClick={() => abrirConfirmacionCancelar(sesion.id)}
                               className={`
-                              flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all
-                              ${loadingCancelar === sesion.id ?
+                                flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all
+                                ${loadingCancelar === sesion.id ?
                                   'bg-gray-200 text-gray-800 cursor-wait' :
                                   'bg-gray-500 text-white hover:bg-gray-600 shadow-sm hover:shadow-md'
                                 }
-                                 disabled:opacity-70 disabled:cursor-not-allowed
+                                disabled:opacity-70 disabled:cursor-not-allowed
                               `}
                             >
                               {loadingCancelar === sesion.id ? (
@@ -209,6 +233,44 @@ const Sesiones = ({
         idPaciente={terapiaSeleccionada?.idPaciente}
         idTerapia={terapiaSeleccionada?.id}
       />
+
+      {/* Modal de Confirmación para Cancelar Sesión */}
+      {confirmacionCancelar.isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900">Confirmar cancelación</h3>
+            <p className="mt-2 text-sm text-gray-500">
+              ¿Estás seguro que deseas cancelar esta sesión? Esta acción no se puede deshacer.
+            </p>
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={cerrarConfirmacionCancelar}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmarCancelacion}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
+              >
+                {loadingCancelar === confirmacionCancelar.idSesion ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Cancelando...
+                  </>
+                ) : (
+                  'Sí, cancelar sesión'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
